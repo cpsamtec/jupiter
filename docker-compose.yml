@@ -1,0 +1,46 @@
+version: '2'
+services:
+  samtecdeviceshare:
+    build: samtecdeviceshare
+    ports:
+      - "1337:1337"
+      - "47546:47546"
+    environment:
+      - APP_IMG_PATH=/img.png
+      - APP_DATA_DIR=/data
+      - APP_LOG_PATH=/tmp/logs
+    volumes:
+      - 'logs-volume:/tmp/logs'
+      - 'resin-data:/data'
+    labels:
+      io.balena.features.supervisor-api: '1'
+      io.balena.features.balena-api: '1'
+      io.balena.features.dbus: '1'
+  switcher:
+    build: switcher
+    privileged: true
+    ports:
+      - "5020:5020"
+      - "80:8000"
+    environment:
+      - BOARD_I2C_DEV=/dev/i2c-1
+      - APP_LOG_PATH=/tmp/logs
+      - APP_DATA_DIR=/data
+      - IO_EXPANDER_I2C_1=0x40
+      - IO_EXPANDER_I2C_2=0x42
+      - SWITCHER_ENV=production
+      - DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
+    devices:
+      - "/dev/i2c-1:/dev/i2c-1"
+      - "/dev/mem:/dev/mem"
+    cap_add:
+      - SYS_RAWIO
+    volumes:
+      - 'logs-volume:/tmp/logs'
+      - 'resin-data:/data'
+volumes:
+     logs-volume: 
+     resin-data: 
+
+
+
