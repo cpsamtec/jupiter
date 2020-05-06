@@ -16,19 +16,13 @@ services:
       io.balena.features.supervisor-api: '1'
       io.balena.features.balena-api: '1'
       io.balena.features.dbus: '1'
-  switcher:
-    build: switcher
+  notebook:
+    build: notebook
     privileged: true
     ports:
       - "5020:5020"
-      - "80:8000"
+      - "80:80"
     environment:
-      - BOARD_I2C_DEV=/dev/i2c-1
-      - APP_LOG_PATH=/tmp/logs
-      - APP_DATA_DIR=/data
-      - IO_EXPANDER_I2C_1=0x40
-      - IO_EXPANDER_I2C_2=0x42
-      - SWITCHER_ENV=production
       - DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
     devices:
       - "/dev/i2c-1:/dev/i2c-1"

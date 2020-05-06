@@ -1,0 +1,3 @@
+[submodule "samtecdeviceshare"]
+	path = samtecdeviceshare
+	url = https://bitbucket.org/samteccmd/samtecdeviceshare.git
