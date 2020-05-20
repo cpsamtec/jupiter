@@ -10,6 +10,7 @@ RUN apt-get update && \
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 RUN python3 get-pip.py --force-reinstall
 RUN pip3 install jupyter jupyterlab
+RUN pip3 install wheel pyrpio pyrpiic numpy 
 WORKDIR /data
 #RUN jupyter notebook password
 
