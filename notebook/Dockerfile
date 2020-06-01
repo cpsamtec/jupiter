@@ -22,10 +22,9 @@ RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
 
-
-WORKDIR /data
+COPY progs_wrapper.sh /app/
+WORKDIR /lab
 #RUN jupyter notebook password
 
-
-#CMD [ "sleep", "infinity" ]
-CMD ["jupyter", "notebook", "--allow-root", "--no-browser", "--ip=*", "--port=80" ]
+CMD [ "bash", "/app/progs_wrapper.sh" ]
+#CMD ["jupyter", "notebook", "--allow-root", "--no-browser", "--ip=*", "--port=80" ]
