@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Start the first process
-code-server --bind-addr 0.0.0.0:8080 --config /program/code-server.yml --user-data-dir /code &
+cd /code
+code-server --bind-addr 0.0.0.0:8080 --config /program/code-server.yml --user-data-dir /program &
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start code-server: $status"
@@ -9,6 +10,7 @@ if [ $status -ne 0 ]; then
 fi
 
 # Start the second process
+cd /lab
 jupyter notebook --allow-root --no-browser --ip=* --port=8082 &
 status=$?
 if [ $status -ne 0 ]; then

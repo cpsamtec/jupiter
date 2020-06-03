@@ -15,16 +15,19 @@ RUN pip3 install jupyter_contrib_nbextensions
 RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidget@4.8.1 \
      qgrid2 \
     jupyterlab-dash jupyterlab-plotly @jupyter-widgets/jupyterlab-manager \
-    @karosc/jupyterlab_dracula @lckr/jupyterlab_variableinspector
+    @karosc/jupyterlab_dracula @lckr/jupyterlab_variableinspector jupyterlab-s3-browser
+#jupyterlab-git
 #jupyterlab-cpustatus @jupyterlab/hdf5 @jupyterlab/dataregistry-extension
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
-
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
 
 COPY progs_wrapper.sh /app/
 WORKDIR /lab
 #RUN jupyter notebook password
+ENV SHELL=/bin/bash
+RUN pip3 install --upgrade jupyterlab-s3-browser jupyterlab-git aioboto3
+RUN jupyter lab build
 
 CMD [ "bash", "/app/progs_wrapper.sh" ]
 #CMD ["jupyter", "notebook", "--allow-root", "--no-browser", "--ip=*", "--port=80" ]

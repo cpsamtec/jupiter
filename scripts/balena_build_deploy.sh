@@ -3,6 +3,8 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR/.. 
 
+bash scripts/create-local-docker-compose.sh 
+
 AARCH=${BUILD_ARCH:='aarch64'}
 SYSTEM_ARCH=$(uname -m)
 if [ "$AARCH" = 'aarch64' ]; then 

@@ -46,12 +46,23 @@ services:
     #platform: 'linux/arm64'
     ports:
       - "80:80"
+  minio:
+    build: minio
+    ports:
+      - "9000:9000"
+    environment:
+      - APP_LOG_PATH=/tmp/logs
+    volumes:
+      - 'storage:/data'
+    command: ["sleep", "infinity"]
+    #platform: 'linux/arm64'
 volumes:
      logs-volume: 
      resin-data: 
      program:
      code:
      lab:
+     storage:
 
 
 
