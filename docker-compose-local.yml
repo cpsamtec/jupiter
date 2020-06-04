@@ -47,14 +47,19 @@ services:
     ports:
       - "80:80"
   minio:
-    build: minio
+    build: 
+      context: ./minio
+      dockerfile: Dockerfile.arm64.release
     ports:
       - "9000:9000"
     environment:
       - APP_LOG_PATH=/tmp/logs
+      #- MINIO_ACCESS_KEY
+      #- MINIO_SECRET_KEY
     volumes:
       - 'storage:/data'
-    command: ["sleep", "infinity"]
+      - 'program:/program'
+    command: ["minio", "server", "/storage", "--certs-dir", "/program/minio"]
     platform: 'linux/arm64'
 volumes:
      logs-volume: 
