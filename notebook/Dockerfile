@@ -21,13 +21,13 @@ RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager plotlywidge
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
+RUN pip3 install --upgrade jupyterlab-s3-browser jupyterlab-git aioboto3
+RUN jupyter lab build
 
-COPY progs_wrapper.sh /app/
+COPY progs_wrapper.sh credentials.sh /app/
 WORKDIR /lab
 #RUN jupyter notebook password
 ENV SHELL=/bin/bash
-RUN pip3 install --upgrade jupyterlab-s3-browser jupyterlab-git aioboto3
-RUN jupyter lab build
 
 CMD [ "bash", "/app/progs_wrapper.sh" ]
 #CMD ["jupyter", "notebook", "--allow-root", "--no-browser", "--ip=*", "--port=80" ]
