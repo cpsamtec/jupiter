@@ -46,6 +46,7 @@ services:
     #platform: 'linux/arm64'
     ports:
       - "80:80"
+      - "8050:8050" # for dash server
   minio:
     build: 
       context: ./minio
