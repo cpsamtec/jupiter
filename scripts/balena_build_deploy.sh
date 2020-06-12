@@ -21,7 +21,7 @@ elif [ "$DEPLOY_ARCH" = 'amd64' ]; then
     else
         balena build --projectName jupyter-x86 --deviceType intel-nuc --arch amd64 -B 'NOTEBOOK_BASE_IMAGE=python:3.8-buster' -B 'SDS_BASE_IMAGE=python:3.8-alpine'
     fi
-    balena deploy --deviceType raspberrypi4-64 --arch aarch64 -B 'NOTEBOOK_BASE_IMAGE=python:3.8-buster' -B 'SDS_BASE_IMAGE=python:3.8-alpine' jupyter-x86
+    balena deploy --project-name jupyter-x86 --deviceType raspberrypi4-64 --arch aarch64 -B 'NOTEBOOK_BASE_IMAGE=python:3.8-buster' -B 'SDS_BASE_IMAGE=python:3.8-alpine' jupyter-x86
 else #arm7
     if [ "$SYSTEM_ARCH" = 'x86_64' ]; then 
         docker-compose -f docker-compose-local.yml build --build-arg 'NOTEBOOK_BASE_IMAGE=python:3.8-buster' --build-arg 'SDS_BASE_IMAGE=balenalib/armv7hf-alpine-python:3.7' samtecdeviceshare nginx notebook minio
