@@ -37,7 +37,7 @@ else #arm7
     else 
         balena build --arch armv7hf ${BALENA_BUILD_ARGS} 
     fi
-    balena deploy --arch armv7hf ${BALENA_BUILD_ARGS} jupyter
+    balena deploy --arch armv7hf ${BALENA_BUILD_ARGS} jupyter-arm32v7
 fi
 
 
