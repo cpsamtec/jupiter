@@ -26,9 +26,9 @@ elif [ "$DEPLOY_ARCH" = 'amd64' ]; then
     if [ "$SYSTEM_ARCH" = 'x86_64' ]; then 
         docker-compose --project-name jupyter-x86 build ${COMPOSE_BUILD_ARGS} ${SERVICES}
     else
-        balena build --projectName jupyter-x86 --deviceType intel-nuc --arch amd64 ${BALENA_BUILD_ARGS} 
+        balena build --projectName jupyter-x86 --arch amd64 ${BALENA_BUILD_ARGS} 
     fi
-    balena deploy --project-name jupyter-x86 --deviceType intel-nuc --arch amd64 ${BALENA_BUILD_ARGS} jupyter-x86
+    balena deploy --project-name jupyter-x86 --arch amd64 ${BALENA_BUILD_ARGS} jupyter-x86
 else #arm7
     COMPOSE_BUILD_ARGS=${COMPOSE_BUILD_ARGS//DOCKER_ARCH/arm32v7}
     BALENA_BUILD_ARGS=${BALENA_BUILD_ARGS//DOCKER_ARCH/arm32v7}
