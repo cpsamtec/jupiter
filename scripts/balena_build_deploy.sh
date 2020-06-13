@@ -17,9 +17,9 @@ if [ "$DEPLOY_ARCH" = 'aarch64' ]; then
     if [ "$SYSTEM_ARCH" = 'x86_64' ]; then 
         docker-compose -f docker-compose-aarch64.yml build ${COMPOSE_BUILD_ARGS} ${SERVICES} 
     else
-        balena build --deviceType raspberrypi4-64 --arch aarch64 ${BALENA_BUILD_ARGS} 
+        balena build --arch aarch64 ${BALENA_BUILD_ARGS} 
     fi
-    balena deploy --deviceType raspberrypi4-64 --arch aarch64 ${BALENA_BUILD_ARGS} jupyter
+    balena deploy --arch aarch64 ${BALENA_BUILD_ARGS} jupyter
 elif [ "$DEPLOY_ARCH" = 'amd64' ]; then 
     COMPOSE_BUILD_ARGS=${COMPOSE_BUILD_ARGS//DOCKER_ARCH/amd64}
     BALENA_BUILD_ARGS=${BALENA_BUILD_ARGS//DOCKER_ARCH/amd64}
@@ -35,9 +35,9 @@ else #arm7
     if [ "$SYSTEM_ARCH" = 'x86_64' ]; then 
         docker-compose -f docker-compose-armv7hf.yml build ${BALENA_BUILD_ARGS} ${SERVICES}
     else 
-        balena build --deviceType raspberrypi4-64 --arch armv7hf ${BALENA_BUILD_ARGS} 
+        balena build --arch armv7hf ${BALENA_BUILD_ARGS} 
     fi
-    balena deploy --deviceType raspberrypi4-64 --arch armv7hf ${BALENA_BUILD_ARGS} jupyter
+    balena deploy --arch armv7hf ${BALENA_BUILD_ARGS} jupyter
 fi
 
 
