@@ -1,4 +1,4 @@
-version: '2.4'
+version: '2.0'
 services:
   samtecdeviceshare:
     build: samtecdeviceshare
@@ -17,7 +17,7 @@ services:
       io.balena.features.balena-api: '1'
       io.balena.features.dbus: '1'
   notebook:
-    platform: 'linux/arm64'
+    #platform: 'linux/arm64'
     build: notebook
     privileged: true
     ports:
@@ -43,14 +43,14 @@ services:
     depends_on: 
       - samtecdeviceshare 
       - notebook
-    platform: 'linux/arm64'
+    #platform: 'linux/arm64'
     ports:
       - "80:80"
       - "8050:8050" # for dash server
   minio:
     build: 
       context: ./minio
-      dockerfile: Dockerfile.arm64.release
+      dockerfile: Dockerfile.arm.release
     ports:
       - "9000:9000"
     environment:
@@ -61,7 +61,7 @@ services:
       - 'storage:/data'
       - 'program:/program'
     command: ["minio", "server", "/storage", "--certs-dir", "/program/minio"]
-    platform: 'linux/arm64'
+    #platform: 'linux/arm64'
 volumes:
      logs-volume: 
      resin-data: 

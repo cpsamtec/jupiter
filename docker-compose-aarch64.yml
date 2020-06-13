@@ -1,0 +1,74 @@
+version: '2.0'
+services:
+  samtecdeviceshare:
+    build: samtecdeviceshare
+    ports:
+      - "1337:1337"
+      - "47546:47546"
+    environment:
+      - APP_IMG_PATH=/img.png
+      - APP_DATA_DIR=/data
+      - APP_LOG_PATH=/tmp/logs
+    volumes:
+      - 'logs-volume:/tmp/logs'
+      - 'resin-data:/data'
+    labels:
+      io.balena.features.supervisor-api: '1'
+      io.balena.features.balena-api: '1'
+      io.balena.features.dbus: '1'
+  notebook:
+    #platform: 'linux/arm64'
+    build: notebook
+    privileged: true
+    ports:
+      - "5020:5020"
+      - "8080:8080"
+      - "8082:8082"
+    environment:
+      - UDEV=1
+      - DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
+    devices:
+      - "/dev/i2c-1:/dev/i2c-1"
+      - "/dev/mem:/dev/mem"
+    cap_add:
+      - SYS_RAWIO
+    volumes:
+      - 'logs-volume:/tmp/logs'
+      - 'resin-data:/data'
+      - 'lab:/lab'
+      - 'code:/code'
+      - 'program:/program'
+  nginx:
+    build: nginx
+    depends_on: 
+      - samtecdeviceshare 
+      - notebook
+    #platform: 'linux/arm64'
+    ports:
+      - "80:80"
+      - "8050:8050" # for dash server
+  minio:
+    build: 
+      context: ./minio
+      dockerfile: Dockerfile.arm64.release
+    ports:
+      - "9000:9000"
+    environment:
+      - APP_LOG_PATH=/tmp/logs
+      #- MINIO_ACCESS_KEY
+      #- MINIO_SECRET_KEY
+    volumes:
+      - 'storage:/data'
+      - 'program:/program'
+    command: ["minio", "server", "/storage", "--certs-dir", "/program/minio"]
+    #platform: 'linux/arm64'
+volumes:
+     logs-volume: 
+     resin-data: 
+     program:
+     code:
+     lab:
+     storage:
+
+
+

@@ -21,11 +21,11 @@ RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager 
     @karosc/jupyterlab_dracula @lckr/jupyterlab_variableinspector jupyterlab-s3-browser 
 #jupyterlab-cpustatus @jupyterlab/hdf5 @jupyterlab/dataregistry-extension
 RUN pip3 install --upgrade jupyterlab-s3-browser jupyterlab-git boto3 minio aioboto3 psutil plotly dash jupyter-dash qgrid
-RUN jupyter lab build
-RUN jupyter nbextension enable --py --sys-prefix qgrid
-RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 RUN jupyter labextension install --no-build @axlair/jupyterlab_vim
 RUN jupyter labextension disable @axlair/jupyterlab_vim
+RUN jupyter nbextension enable --py --sys-prefix qgrid
+RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
+RUN jupyter lab build
 RUN code-server --install-extension atlassian.atlascode \
     #&& code-server --install-extension vscodevim.vim \
     && code-server --install-extension  ms-python.python \
