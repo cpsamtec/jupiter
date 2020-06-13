@@ -2,4 +2,4 @@
 set -e
 code-server --install-extension vscodevim.vim 
 jupyter labextension enable @axlair/jupyterlab_vim
-RUN jupyter lab build
+jupyter lab build
