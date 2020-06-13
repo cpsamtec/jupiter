@@ -26,9 +26,14 @@ RUN jupyter nbextension enable --py --sys-prefix qgrid
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension
 RUN jupyter labextension install --no-build @axlair/jupyterlab_vim
 RUN jupyter labextension disable @axlair/jupyterlab_vim
+RUN code-server --install-extension atlassian.atlascode \
+    #&& code-server --install-extension vscodevim.vim \
+    && code-server --install-extension  ms-python.python \
+    && code-server --install-extension ms-pyright.pyright \
+    && code-server --install-extension njpwerner.autodocstring
 
 
-COPY progs_wrapper.sh credentials.sh /app/
+COPY progs_wrapper.sh credentials.sh vim_users.sh /app/
 WORKDIR /lab
 ENV SHELL=/bin/bash
 
