@@ -1,4 +1,19 @@
 ARG NOTEBOOK_BASE_IMAGE 
+ARG BASE_IMAGE_ARCH 
+FROM ${BASE_IMAGE_ARCH}/golang:buster as mc_builder
+
+ENV GOPATH /go
+ENV CGO_ENABLED 0
+ENV GO111MODULE on
+
+RUN  \
+     apt-get install git && \
+     git clone https://github.com/minio/mc && cd mc && \
+     go install -v -ldflags "$(go run buildscripts/gen-ldflags.go)"
+
+
+
+ARG NOTEBOOK_BASE_IMAGE 
 FROM $NOTEBOOK_BASE_IMAGE 
 
 RUN apt-get update && \
@@ -34,6 +49,8 @@ RUN code-server --install-extension atlassian.atlascode \
 
 
 COPY progs_wrapper.sh credentials.sh vim_users.sh /app/
+COPY --from=mc_builder /go/bin/mc /usr/bin/mc
+#RUN mc --config-dir /program/.mc
 WORKDIR /lab
 ENV SHELL=/bin/bash
 
