@@ -2,16 +2,23 @@ ARG NOTEBOOK_BASE_IMAGE
 ARG BASE_IMAGE_ARCH 
 FROM ${BASE_IMAGE_ARCH}/golang:buster as mc_builder
 
+RUN mkdir -p /go/bin
+RUN if [ "$BASE_IMAGE_ARCH" = "arm32v7" ] ; then \
+        curl https://dl.min.io/client/mc/release/linux-arm/mc > /go/bin/mc; \
+    elif [ "$BASE_IMAGE_ARCH" = "arm64v8" ] ; then \
+        curl https://dl.min.io/client/mc/release/linux-arm64/mc > /go/bin/mc; \
+    else \ 
+        curl https://dl.min.io/client/mc/release/linux-amd64/mc > /go/bin/mc; \
+    fi
+RUN chmod +x /go/bin/mc
+
 ENV GOPATH /go
 ENV CGO_ENABLED 0
 ENV GO111MODULE on
-
-RUN  \
-     apt-get install git && \
-     git clone https://github.com/minio/mc && cd mc && \
-     go install -v -ldflags "$(go run buildscripts/gen-ldflags.go)"
-
-
+#RUN  \
+     #apt-get install git && \
+     #git clone https://github.com/minio/mc && cd mc && \
+     #go install -v -ldflags "$(go run buildscripts/gen-ldflags.go)"
 
 ARG NOTEBOOK_BASE_IMAGE 
 FROM $NOTEBOOK_BASE_IMAGE 
@@ -50,7 +57,6 @@ RUN code-server --install-extension atlassian.atlascode \
 
 COPY progs_wrapper.sh credentials.sh vim_users.sh /app/
 COPY --from=mc_builder /go/bin/mc /usr/bin/mc
-#RUN mc --config-dir /program/.mc
 WORKDIR /lab
 ENV SHELL=/bin/bash
 
