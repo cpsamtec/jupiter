@@ -3,11 +3,15 @@ ARG BASE_IMAGE_ARCH
 FROM ${BASE_IMAGE_ARCH}/golang:buster as mc_builder
 
 RUN mkdir -p /go/bin
+ARG BASE_IMAGE_ARCH 
 RUN if [ "$BASE_IMAGE_ARCH" = "arm32v7" ] ; then \
+        echo "Getting arm32 minio client" && \
         curl https://dl.min.io/client/mc/release/linux-arm/mc > /go/bin/mc; \
     elif [ "$BASE_IMAGE_ARCH" = "arm64v8" ] ; then \
+        echo "Getting arm64 minio client" && \
         curl https://dl.min.io/client/mc/release/linux-arm64/mc > /go/bin/mc; \
     else \ 
+        echo "Getting amd64 minio client" && \
         curl https://dl.min.io/client/mc/release/linux-amd64/mc > /go/bin/mc; \
     fi
 RUN chmod +x /go/bin/mc
