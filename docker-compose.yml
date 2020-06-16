@@ -6,6 +6,7 @@ services:
       - "1337:1337"
       - "47546:47546"
     environment:
+      - PYTHON_ENV=production
       - APP_IMG_PATH=/img.png
       - APP_DATA_DIR=/data
       - APP_LOG_PATH=/tmp/logs
