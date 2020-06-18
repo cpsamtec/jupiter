@@ -2,13 +2,15 @@
 set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR/.. 
+[ ! -e .env ] && echo "no .env file" && exit 2
+source .env
 
 bash scripts/create-local-docker-compose.sh 
 
 SERVICES="samtecdeviceshare nginx notebook minio"
 DEPLOY_ARCH=${DEPLOY_ARCH:='aarch64'}
 SYSTEM_ARCH=$(uname -m)
-BUILD_ARGS="BUILD_ARG BASE_IMAGE_ARCH=DOCKER_ARCH BUILD_ARG NOTEBOOK_BASE_IMAGE=DOCKER_ARCH/python:3.8-buster BUILD_ARG SDS_BASE_IMAGE=DOCKER_ARCH/python:3.8-alpine"
+BUILD_ARGS="BUILD_ARG USER_PASSWORD=${USER_PASSWORD} BUILD_ARG BASE_IMAGE_ARCH=DOCKER_ARCH BUILD_ARG NOTEBOOK_BASE_IMAGE=DOCKER_ARCH/python:3.8-buster BUILD_ARG SDS_BASE_IMAGE=DOCKER_ARCH/python:3.8-alpine"
 COMPOSE_BUILD_ARGS=${BUILD_ARGS//BUILD_ARG/--build-arg}
 BALENA_BUILD_ARGS=${BUILD_ARGS//BUILD_ARG/-B}
 if [ "$DEPLOY_ARCH" = 'aarch64' ]; then 
@@ -28,7 +30,7 @@ elif [ "$DEPLOY_ARCH" = 'amd64' ]; then
     else
         balena build --projectName jupyter-x86 --arch amd64 ${BALENA_BUILD_ARGS} 
     fi
-    balena deploy --project-name jupyter-x86 --arch amd64 ${BALENA_BUILD_ARGS} jupyter-x86
+    #balena deploy --project-name jupyter-x86 --arch amd64 ${BALENA_BUILD_ARGS} jupyter-x86
 else #arm7
     COMPOSE_BUILD_ARGS=${COMPOSE_BUILD_ARGS//DOCKER_ARCH/arm32v7}
     BALENA_BUILD_ARGS=${BALENA_BUILD_ARGS//DOCKER_ARCH/arm32v7}

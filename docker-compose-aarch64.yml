@@ -25,9 +25,10 @@ services:
       - "5020:5020"
       - "8080:8080"
       - "8082:8082"
+      - "22222:22"
     environment:
       - UDEV=1
-      - DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
+      #- DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
       - "/dev/mem:/dev/mem"
