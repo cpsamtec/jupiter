@@ -11,21 +11,21 @@ SSH_KEY_RSA="${CONF_DIR}/dropbear_rsa_host_key"
 if [ ! -d ${CONF_DIR} ]; then
     mkdir -p ${CONF_DIR}
 fi
-chown root:root ${CONF_DIR}
-chmod 755 ${CONF_DIR}
+sudo chown root:root ${CONF_DIR}
+sudo chmod 755 ${CONF_DIR}
 
 # Check if keys exists
 if [ ! -f ${SSH_KEY_DSS} ]; then
-    dropbearkey  -t dss -f ${SSH_KEY_DSS}
+    sudo dropbearkey  -t dss -f ${SSH_KEY_DSS}
 fi
-chown root:root ${SSH_KEY_DSS}
-chmod 600 ${SSH_KEY_DSS}
+sudo chown root:root ${SSH_KEY_DSS}
+sudo chmod 600 ${SSH_KEY_DSS}
 
 if [ ! -f ${SSH_KEY_RSA} ]; then
-    dropbearkey  -t rsa -f ${SSH_KEY_RSA} -s 2048
+    sudo dropbearkey  -t rsa -f ${SSH_KEY_RSA} -s 2048
 fi
-chown root:root ${SSH_KEY_RSA}
-chmod 600 ${SSH_KEY_RSA}
+sudo chown root:root ${SSH_KEY_RSA}
+sudo chmod 600 ${SSH_KEY_RSA}
 
 
 
@@ -50,7 +50,7 @@ fi
 # Start the third process
 echo "starting dropbear"
 #/usr/sbin/dropbear -j -k -E -F &
-/usr/sbin/dropbear &
+sudo /usr/sbin/dropbear &
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start dropbear: $status"
