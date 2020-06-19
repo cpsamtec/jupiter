@@ -66,9 +66,11 @@ RUN pip3 install --upgrade jupyterlab-s3-browser jupyterlab-git boto3 minio \
 
 #RUN jupyter labextension install --no-build @axlair/jupyterlab_vim
 #RUN jupyter labextension disable @axlair/jupyterlab_vim
-RUN jupyter nbextension enable --py qgrid
-RUN jupyter nbextension enable --py widgetsnbextension
+RUN jupyter nbextension enable --py qgrid 
+RUN jupyter nbextension enable --py widgetsnbextension 
 RUN jupyter lab build
+RUN jupyter serverextension enable --py jupyterlab --user
+RUN jupyter serverextension enable --py jupyterlab_git --user
 RUN code-server --install-extension atlassian.atlascode \
     #&& code-server --install-extension vscodevim.vim \
     && code-server --install-extension  ms-python.python \
