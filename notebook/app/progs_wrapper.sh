@@ -1,8 +1,27 @@
 #!/bin/bash
-
-if [ ! -d /program/.vscode-server ]; then
-  mkdir -p /program/.vscode-server
+echo "running notebook"
+set -x
+SET_JUP_DIR="JUPYTERLAB_DIR=${JUPYTERLAB_DIR}"
+SET_VIM_USER="VIM_USER=${VIM_USER:=0}"
+USER=$(stat -c '%U' /lab)
+if [ $USER != "dev" ]; then 
+  chown -R dev:dev /lab 
+  chown -R dev:dev /code 
+  chown -R dev:dev /home/dev 
 fi
+
+if [ ! -d /home/dev/.vscode-server ]; then 
+  echo "add default extensions in future"
+fi
+
+if [ ! -d /home/dev/.local/share/jupyter ]; then
+  su - dev -c "${SET_VIM_USER} ${SET_JUP_DIR} bash /app/jupyter-installs.sh"
+fi
+
+if [ ! -d /home/dev/.local/share/code-server ]; then
+  su - dev -c "bash /app/code-server-installs.sh"
+fi
+
 CONF_DIR="/program/dropbear"
 SSH_KEY_DSS="${CONF_DIR}/dropbear_dss_host_key"
 SSH_KEY_RSA="${CONF_DIR}/dropbear_rsa_host_key"
@@ -11,27 +30,25 @@ SSH_KEY_RSA="${CONF_DIR}/dropbear_rsa_host_key"
 if [ ! -d ${CONF_DIR} ]; then
     mkdir -p ${CONF_DIR}
 fi
-sudo chown root:root ${CONF_DIR}
-sudo chmod 755 ${CONF_DIR}
+chown root:root ${CONF_DIR}
+chmod 755 ${CONF_DIR}
 
 # Check if keys exists
 if [ ! -f ${SSH_KEY_DSS} ]; then
-    sudo dropbearkey  -t dss -f ${SSH_KEY_DSS}
+    dropbearkey  -t dss -f ${SSH_KEY_DSS}
 fi
-sudo chown root:root ${SSH_KEY_DSS}
-sudo chmod 600 ${SSH_KEY_DSS}
+chown root:root ${SSH_KEY_DSS}
+chmod 600 ${SSH_KEY_DSS}
 
 if [ ! -f ${SSH_KEY_RSA} ]; then
-    sudo dropbearkey  -t rsa -f ${SSH_KEY_RSA} -s 2048
+    dropbearkey  -t rsa -f ${SSH_KEY_RSA} -s 2048
 fi
-sudo chown root:root ${SSH_KEY_RSA}
-sudo chmod 600 ${SSH_KEY_RSA}
-
-
+chown root:root ${SSH_KEY_RSA}
+chmod 600 ${SSH_KEY_RSA}
 
 # Start the first process
 cd /code
-code-server --bind-addr 0.0.0.0:8080 --config /program/code-server.yml --user-data-dir /program &
+su - dev -c "code-server --bind-addr 0.0.0.0:8080 &"
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start code-server: $status"
@@ -40,7 +57,7 @@ fi
 
 # Start the second process
 cd /lab
-jupyter notebook --allow-root --no-browser --ip=* --port=8082 &
+su - dev -c "cd /lab; ${SET_JUP_DIR} jupyter notebook --no-browser --ip=* --port=8082 &"
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start jupyter: $status"
@@ -49,8 +66,7 @@ fi
 
 # Start the third process
 echo "starting dropbear"
-#/usr/sbin/dropbear -j -k -E -F &
-sudo /usr/sbin/dropbear &
+/usr/sbin/dropbear &
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start dropbear: $status"

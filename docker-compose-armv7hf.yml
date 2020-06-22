@@ -25,10 +25,12 @@ services:
       - "5020:5020"
       - "8080:8080"
       - "8082:8082"
-      - "22222:22"
+      - "28282:22"
+      - "8050:8050" # dash server
+      - "33000:33000" # spare
     environment:
       - UDEV=1
-      #- DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
+      - DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
       - "/dev/mem:/dev/mem"
@@ -37,9 +39,10 @@ services:
     volumes:
       - 'logs-volume:/tmp/logs'
       - 'resin-data:/data'
-      - 'lab:/lab'
-      - 'code:/code'
-      - 'program:/program'
+      - 'nb-lab:/lab'
+      - 'nb-code:/code'
+      - 'nb-program:/program'
+      - 'nb-home:/home/dev'
   nginx:
     build: nginx
     depends_on: 
@@ -48,7 +51,6 @@ services:
     #platform: 'linux/arm64'
     ports:
       - "80:80"
-      - "8050:8050" # for dash server
   minio:
     build: 
       context: ./minio
@@ -61,15 +63,17 @@ services:
       #- MINIO_SECRET_KEY
     volumes:
       - 'storage:/data'
-      - 'program:/program'
+      - 'minio-program:/program'
     command: ["minio", "server", "/storage", "--certs-dir", "/program/minio"]
     #platform: 'linux/arm64'
 volumes:
      logs-volume: 
      resin-data: 
-     program:
-     code:
-     lab:
+     nb-program:
+     nb-code:
+     nb-lab:
+     nb-home:
+     minio-program:
      storage:
 
 
