@@ -15,3 +15,6 @@ jupyter nbextension enable --py widgetsnbextension
 jupyter lab build --log-level=30
 jupyter serverextension enable --py jupyterlab --user
 jupyter serverextension enable --py jupyterlab_git --user
+
+echo "done" > /home/dev/.jupyter-ext-installed
+sync

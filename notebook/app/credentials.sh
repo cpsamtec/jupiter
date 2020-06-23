@@ -1,8 +1,8 @@
 #/usr/bin/env bash
 
 echo "getting credentials"
-#token=$(su - dev -c "jupyter notebook list" | grep token | sed -n '0,/http/s/.*token=\([a-zA-Z0-9]\+\).*/\1/p')
-token=$(jupyter notebook list | grep token | sed -n '0,/http/s/.*token=\([a-zA-Z0-9]\+\).*/\1/p')
+token=$(su - dev -c "jupyter notebook list" | grep token | sed -n '0,/http/s/.*token=\([a-zA-Z0-9]\+\).*/\1/p')
+#token=$(jupyter notebook list | grep token | sed -n '0,/http/s/.*token=\([a-zA-Z0-9]\+\).*/\1/p')
 
 echo "jupyter lab token is ${token}"
 if [ ! -z ${BALENA_DEVICE_UUID} ]; then

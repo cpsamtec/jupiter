@@ -63,18 +63,19 @@ RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager 
     jupyterlab-dash jupyterlab-plotly @jupyter-widgets/jupyterlab-manager \
     @karosc/jupyterlab_dracula @lckr/jupyterlab_variableinspector jupyterlab-s3-browser 
 
+ENV JUPYTERLAB_DIR_DEFAULT=/user-ext/dev/lab/default 
+ENV JUPYTERLAB_DIR_VIM=/user-ext/dev/lab/vim
+RUN mkdir -p ${JUPYTERLAB_DIR_DEFAULT} ${JUPYTERLAB_DIR_VIM} 
+RUN chown -R dev:dev /user-ext/dev/
+ENV JUPYTERLAB_DIR=${JUPYTERLAB_DIR_DEFAULT}
 
-RUN jupyter nbextension enable --py qgrid 
-RUN jupyter nbextension enable --py widgetsnbextension 
-RUN jupyter lab build --log-level=30
-RUN jupyter serverextension enable --py jupyterlab 
-RUN jupyter serverextension enable --py jupyterlab_git 
+COPY user-jupyter-installs.sh /tmp
+RUN su -w "JUPYTERLAB_DIR_DEFAULT,JUPYTERLAB_DIR_VIM" - dev -c "bash /tmp/user-jupyter-installs.sh" 
 
 COPY --from=arch_loader /out/minio/bin/mc /usr/bin/mc
 COPY /app/ /app/
 ENV SHELL=/bin/bash
 ENV PATH="${PATH}:/home/dev/.local/bin"
-#ENV JUPYTERLAB_DIR=/home/dev/.local/share/jupyter/lab
 RUN echo "dev:dev" | chpasswd
 
 CMD [ "/bin/bash", "/app/progs_wrapper.sh" ]

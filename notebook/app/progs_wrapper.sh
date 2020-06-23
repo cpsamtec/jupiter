@@ -14,7 +14,7 @@ if [ ! -d /home/dev/.vscode-server ]; then
   echo "add default extensions in future"
 fi
 
-#if [ ! -d ${JUPYTERLAB_DIR}/extensions ] || [ $(ls -f ${JUPYTERLAB_DIR}/extensions | wc -l) -lt 4 ] ; then
+#if [ ! -e /home/dev/.jupyter-ext-installed ]; then
   #su -w "JUPYTERLAB_DIR,VIM_USER" - dev -c "bash /app/jupyter-installs.sh"
 #fi
 
@@ -53,7 +53,7 @@ fi
 
 # Start the first process
 cd /code
-su - dev -c "code-server --bind-addr 0.0.0.0:8080 &"
+su -w "BALENA_DEVICE_UUID" - dev -c "code-server --bind-addr 0.0.0.0:8080 &"
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start code-server: $status"
@@ -62,8 +62,8 @@ fi
 
 # Start the second process
 cd /lab
-#su -w "JUPYTERLAB_DIR" - dev  -c "cd /lab; jupyter notebook --no-browser --ip=* --port=8082 &"
-jupyter notebook --allow-root --no-browser --ip=* --port=8082 &
+su -w "JUPYTERLAB_DIR,BALENA_DEVICE_UUID" - dev  -c "cd /lab; jupyter notebook --no-browser --ip=* --port=8082 &"
+#jupyter notebook --allow-root --no-browser --ip=* --port=8082 &
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start jupyter: $status"
