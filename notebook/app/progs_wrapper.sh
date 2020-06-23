@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "running notebook"
 set -x
-JUPYTERLAB_DIR=${JUPYTERLAB_DIR:=/home/dev/.local/share/jupyter/lab}
+#JUPYTERLAB_DIR=${JUPYTERLAB_DIR:=/home/dev/.local/share/jupyter/lab}
 VIM_USER=${VIM_USER:=0}
 USER=$(stat -c '%U' /lab)
 if [ $USER != "dev" ]; then 
@@ -14,9 +14,9 @@ if [ ! -d /home/dev/.vscode-server ]; then
   echo "add default extensions in future"
 fi
 
-if [ ! -d ${JUPYTERLAB_DIR}/extensions ] || [ $(ls -f ${JUPYTERLAB_DIR}/extensions | wc -l) -lt 4 ] ; then
-  su -w "JUPYTERLAB_DIR,VIM_USER" - dev -c "bash /app/jupyter-installs.sh"
-fi
+#if [ ! -d ${JUPYTERLAB_DIR}/extensions ] || [ $(ls -f ${JUPYTERLAB_DIR}/extensions | wc -l) -lt 4 ] ; then
+  #su -w "JUPYTERLAB_DIR,VIM_USER" - dev -c "bash /app/jupyter-installs.sh"
+#fi
 
 if [ ! -d /home/dev/.local/share/code-server ]; then
   su -w "VIM_USER" - dev -c "bash /app/code-server-installs.sh"
@@ -62,7 +62,8 @@ fi
 
 # Start the second process
 cd /lab
-su -w "JUPYTERLAB_DIR" - dev  -c "cd /lab; ${SET_JUP_DIR} jupyter notebook --no-browser --ip=* --port=8082 &"
+#su -w "JUPYTERLAB_DIR" - dev  -c "cd /lab; jupyter notebook --no-browser --ip=* --port=8082 &"
+jupyter notebook --allow-root --no-browser --ip=* --port=8082 &
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start jupyter: $status"

@@ -12,6 +12,6 @@ fi
 
 jupyter nbextension enable --py qgrid 
 jupyter nbextension enable --py widgetsnbextension 
-jupyter lab build
+jupyter lab build --log-level=30
 jupyter serverextension enable --py jupyterlab --user
 jupyter serverextension enable --py jupyterlab_git --user

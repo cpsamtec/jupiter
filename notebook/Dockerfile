@@ -58,11 +58,23 @@ RUN pip3 install --upgrade jupyterlab-s3-browser jupyterlab-git jupyter-dash bot
 RUN su - dev -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash"
 RUN su - dev -c "curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python"
 
+RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager plotlywidget@4.8.1 \
+     qgrid2 \
+    jupyterlab-dash jupyterlab-plotly @jupyter-widgets/jupyterlab-manager \
+    @karosc/jupyterlab_dracula @lckr/jupyterlab_variableinspector jupyterlab-s3-browser 
+
+
+RUN jupyter nbextension enable --py qgrid 
+RUN jupyter nbextension enable --py widgetsnbextension 
+RUN jupyter lab build --log-level=30
+RUN jupyter serverextension enable --py jupyterlab 
+RUN jupyter serverextension enable --py jupyterlab_git 
+
 COPY --from=arch_loader /out/minio/bin/mc /usr/bin/mc
 COPY /app/ /app/
 ENV SHELL=/bin/bash
 ENV PATH="${PATH}:/home/dev/.local/bin"
-ENV JUPYTERLAB_DIR=/home/dev/.local/share/jupyter/lab
+#ENV JUPYTERLAB_DIR=/home/dev/.local/share/jupyter/lab
 RUN echo "dev:dev" | chpasswd
 
 CMD [ "/bin/bash", "/app/progs_wrapper.sh" ]
