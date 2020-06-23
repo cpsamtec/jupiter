@@ -1,8 +1,8 @@
 #!/bin/bash
 echo "running notebook"
 set -x
-SET_JUP_DIR="JUPYTERLAB_DIR=${JUPYTERLAB_DIR}"
-SET_VIM_USER="VIM_USER=${VIM_USER:=0}"
+JUPYTERLAB_DIR=${JUPYTERLAB_DIR:=/home/dev/.local/share/jupyter/lab}
+VIM_USER=${VIM_USER:=0}
 USER=$(stat -c '%U' /lab)
 if [ $USER != "dev" ]; then 
   chown -R dev:dev /lab 
@@ -14,12 +14,12 @@ if [ ! -d /home/dev/.vscode-server ]; then
   echo "add default extensions in future"
 fi
 
-if [ ! -d /home/dev/.local/share/jupyter ]; then
-  su - dev -c "${SET_VIM_USER} ${SET_JUP_DIR} bash /app/jupyter-installs.sh"
+if [ ! -d ${JUPYTERLAB_DIR} ]; then
+  su -w "JUPYTERLAB_DIR,VIM_USER" - dev -c "bash /app/jupyter-installs.sh"
 fi
 
 if [ ! -d /home/dev/.local/share/code-server ]; then
-  su - dev -c "bash /app/code-server-installs.sh"
+  su -w "VIM_USER" - dev -c "bash /app/code-server-installs.sh"
 fi
 
 CONF_DIR="/program/dropbear"
@@ -28,23 +28,28 @@ SSH_KEY_RSA="${CONF_DIR}/dropbear_rsa_host_key"
 
 # Check if conf dir exists
 if [ ! -d ${CONF_DIR} ]; then
-    mkdir -p ${CONF_DIR}
+  mkdir -p ${CONF_DIR}
+  chown root:root ${CONF_DIR}
+  chmod 755 ${CONF_DIR}
 fi
-chown root:root ${CONF_DIR}
-chmod 755 ${CONF_DIR}
 
 # Check if keys exists
 if [ ! -f ${SSH_KEY_DSS} ]; then
-    dropbearkey  -t dss -f ${SSH_KEY_DSS}
+  dropbearkey  -t dss -f ${SSH_KEY_DSS}
+  chown root:root ${SSH_KEY_DSS}
+  chmod 600 ${SSH_KEY_DSS}
 fi
-chown root:root ${SSH_KEY_DSS}
-chmod 600 ${SSH_KEY_DSS}
 
 if [ ! -f ${SSH_KEY_RSA} ]; then
-    dropbearkey  -t rsa -f ${SSH_KEY_RSA} -s 2048
+  dropbearkey  -t rsa -f ${SSH_KEY_RSA} -s 2048
+  chown root:root ${SSH_KEY_RSA}
+  chmod 600 ${SSH_KEY_RSA}
 fi
-chown root:root ${SSH_KEY_RSA}
-chmod 600 ${SSH_KEY_RSA}
+
+mc config host ls | grep -q myminio
+if [ $? -ne 0 ]; then
+  su -w "MINIO_ACCESS_KEY,MINIO_SECRET_KEY" - dev -c "mc config host add myminio http://minio:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}"
+fi
 
 # Start the first process
 cd /code
@@ -57,7 +62,7 @@ fi
 
 # Start the second process
 cd /lab
-su - dev -c "cd /lab; ${SET_JUP_DIR} jupyter notebook --no-browser --ip=* --port=8082 &"
+su -w "JUPYTERLAB_DIR" - dev  -c "cd /lab; ${SET_JUP_DIR} jupyter notebook --no-browser --ip=* --port=8082 &"
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start jupyter: $status"

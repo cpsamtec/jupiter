@@ -65,5 +65,5 @@ ENV PATH="${PATH}:/home/dev/.local/bin"
 ENV JUPYTERLAB_DIR=/home/dev/.local/share/jupyter/lab
 RUN echo "dev:dev" | chpasswd
 
-#CMD [ "/bin/bash", "/app/progs_wrapper.sh" ]
-CMD [ "/bin/bash", "-c", "sleep infinity" ]
+CMD [ "/bin/bash", "/app/progs_wrapper.sh" ]
+#CMD [ "/bin/bash", "-c", "sleep infinity" ]
