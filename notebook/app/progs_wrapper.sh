@@ -14,7 +14,7 @@ if [ ! -d /home/dev/.vscode-server ]; then
   echo "add default extensions in future"
 fi
 
-if [ ! -d ${JUPYTERLAB_DIR} ]; then
+if [ ! -d ${JUPYTERLAB_DIR}/extensions ] || [ $(ls -f ${JUPYTERLAB_DIR}/extensions | wc -l) -lt 4 ] ; then
   su -w "JUPYTERLAB_DIR,VIM_USER" - dev -c "bash /app/jupyter-installs.sh"
 fi
 

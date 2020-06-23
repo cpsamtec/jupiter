@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -x
 jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager plotlywidget@4.8.1 \
      qgrid2 \
     jupyterlab-dash jupyterlab-plotly @jupyter-widgets/jupyterlab-manager \
