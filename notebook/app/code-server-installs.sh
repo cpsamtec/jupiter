@@ -8,3 +8,6 @@ code-server --install-extension atlassian.atlascode \
 if [ ! -z "${VIM_USER}" ] && [ "${VIM_USER}" -ne 0 ]; then 
     code-server --install-extension vscodevim.vim 
 fi
+
+echo "done" > /home/dev/.code-server-ext-installed
+sync

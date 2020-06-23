@@ -18,7 +18,7 @@ fi
   #su -w "JUPYTERLAB_DIR,VIM_USER" - dev -c "bash /app/jupyter-installs.sh"
 #fi
 
-if [ ! -d /home/dev/.local/share/code-server ]; then
+if [ ! -e /home/dev/.code-server-ext-installed ]; then
   su -w "VIM_USER" - dev -c "bash /app/code-server-installs.sh"
 fi
 
