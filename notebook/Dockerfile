@@ -5,7 +5,7 @@ FROM ${BASE_IMAGE_ARCH}/debian:buster as arch_loader
 RUN mkdir -p /out/minio/bin
 RUN mkdir -p /out/clang
 ARG BASE_IMAGE_ARCH 
-RUN apt-get update && apt-get install -y curl xz-utils
+RUN apt-get update && apt-get install -y wget curl xz-utils
 RUN if [ "$BASE_IMAGE_ARCH" = "arm32v7" ] ; then \
         echo "Getting arm32 minio client" && \
         curl https://dl.min.io/client/mc/release/linux-arm/mc > /out/minio/bin/mc; \
@@ -51,10 +51,9 @@ RUN pip3 install jupyter jupyterlab jupyter_contrib_nbextensions
 RUN pip3 install pyrpio pyrpiic 
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-
 RUN pip3 install --upgrade jupyterlab-s3-browser jupyterlab-git jupyter-dash boto3 minio plotly dash qgrid \
-    aioboto3 psutil  fastparquet requests h5py
-
+    aioboto3 psutil  fastparquet requests 
+ # h5py cannot find <mpi.h>
 RUN su - dev -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash"
 RUN su - dev -c "curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python"
 
