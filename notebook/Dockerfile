@@ -1,6 +1,6 @@
 ARG NOTEBOOK_BASE_IMAGE 
 ARG BASE_IMAGE_ARCH 
-FROM ${BASE_IMAGE_ARCH}/debian:buster as arch_loader
+FROM ${BASE_IMAGE_ARCH}/ubuntu:groovy as arch_loader
 
 RUN mkdir -p /out/minio/bin
 RUN mkdir -p /out/clang
@@ -27,9 +27,13 @@ FROM $NOTEBOOK_BASE_IMAGE
 
 RUN apt-get update && \
  DEBIAN_FRONTEND=noninteractive apt-get install -y sudo build-essential vim \
- nano libopenmpi-dev libopenmpi-dev libopenblas-dev libreadline-dev libffi-dev liblapack-dev libhdf5-openmpi-dev hdf5-tools \
-  libfreetype6-dev openssl dropbear wget curl rsync psmisc procps i2c-tools gfortran gcc llvm nodejs npm python3-dev zip gpiod libtinfo5 && \
- apt-get clean
+ nano libopenmpi-dev libopenblas-dev libreadline-dev libffi-dev liblapack-dev libhdf5-openmpi-dev hdf5-tools \
+  libfreetype6-dev openssl dropbear wget curl rsync psmisc procps i2c-tools gfortran gcc llvm \
+ nodejs npm zip gpiod libtinfo5 libzmq3-dev  \
+ python3 python3-dev python3-botocore python3-boto3 python3-numpy python3-scipy cython \
+ python3-matplotlib libhdf5-dev python3-pandas python3-h5py python3-arrow && \
+ apt-get clean && \
+ echo "Installed alpine packages successfully."
 
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 RUN python3 get-pip.py --force-reinstall
