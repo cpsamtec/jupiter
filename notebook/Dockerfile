@@ -26,14 +26,14 @@ ARG NOTEBOOK_BASE_IMAGE
 FROM $NOTEBOOK_BASE_IMAGE 
 
 RUN apt-get update && \
- DEBIAN_FRONTEND=noninteractive apt-get install -y sudo build-essential vim \
+ DEBIAN_FRONTEND=noninteractive apt-get install -y cmake avahi-utils iputils-ping sudo build-essential vim \
  nano libopenmpi-dev libopenblas-dev libreadline-dev libffi-dev liblapack-dev libhdf5-openmpi-dev hdf5-tools \
   libfreetype6-dev openssl dropbear wget curl rsync psmisc procps i2c-tools gfortran gcc llvm \
  nodejs npm zip gpiod libtinfo5 libzmq3-dev  \
  python3 python3-dev python3-botocore python3-boto3 python3-numpy python3-scipy cython \
  python3-matplotlib libhdf5-dev python3-pandas python3-h5py python3-arrow && \
  apt-get clean && \
- echo "Installed alpine packages successfully."
+ echo "Installed packages successfully."
 
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 RUN python3 get-pip.py --force-reinstall
@@ -44,6 +44,8 @@ RUN useradd --create-home --shell /bin/bash dev && \
  chown -R dev:dev /lab && \
  mkdir /code && \
  chown -R dev:dev /code && \
+ mkdir /dev-apps && \
+ chown -R dev:dev /dev-apps && \
  mkdir /program 
 VOLUME [ "/code", "/lab", "/program" ]
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
@@ -54,12 +56,20 @@ RUN pip3 install wheel numpy pandas matplotlib numba cython scipy pipenv
 RUN pip3 install jupyter jupyterlab jupyter_contrib_nbextensions 
 RUN pip3 install pyrpio pyrpiic 
 RUN curl -fsSL https://code-server.dev/install.sh | sh
+RUN curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+RUN chmod +x /usr/local/bin/docker-compose && ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+
 
 RUN pip3 install --upgrade jupyterlab-s3-browser jupyterlab-git jupyter-dash boto3 minio plotly dash qgrid \
     aioboto3 psutil  fastparquet requests 
  # h5py cannot find <mpi.h>
 RUN su - dev -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash"
 RUN su - dev -c "curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python"
+ENV CARGO_HOME=/dev-apps/sdk/cargo
+ENV RUSTUP_HOME=/dev-apps/sdk/rustup
+RUN su -w "CARGO_HOME,RUSTUP_HOME" - dev -c "mkdir -p ${CARGO_HOME} ${RUSTUP_HOME} && curl https://sh.rustup.rs -sSf | bash -s -- -y"
+ENV PATH="${PATH}:${CARGO_HOME}/bin"
 
 RUN jupyter labextension install --no-build @jupyter-widgets/jupyterlab-manager plotlywidget@4.8.1 \
      qgrid2 \

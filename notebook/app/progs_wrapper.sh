@@ -53,7 +53,7 @@ fi
 
 # Start the first process
 cd /code
-su -w "BALENA_DEVICE_UUID" - dev -c "code-server --bind-addr 0.0.0.0:8080 &"
+su -w "CARGO_HOME,RUSTUP_HOME,BALENA_DEVICE_UUID" - dev -c "code-server --bind-addr 0.0.0.0:8080 /code &"
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start code-server: $status"
