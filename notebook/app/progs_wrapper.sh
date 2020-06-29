@@ -79,6 +79,16 @@ if [ $status -ne 0 ]; then
   exit $status
 fi
 
+for f in $(ls /dev/i2c-*); do 
+  chown :i2c "$f"
+  chmod g+rw "$f"
+done
+if [ -e /dev/gpiomem ]; then 
+  chown :gpio "/dev/gpiomem"
+  chmod g+rw "/dev/gpiomem"
+fi
+
+
 while sleep 60; do
   ps aux |grep code-server | grep -q -v grep
   PROCESS_1_STATUS=$?

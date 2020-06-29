@@ -26,7 +26,7 @@ ARG NOTEBOOK_BASE_IMAGE
 FROM $NOTEBOOK_BASE_IMAGE 
 
 RUN apt-get update && \
- DEBIAN_FRONTEND=noninteractive apt-get install -y cmake avahi-utils iputils-ping sudo build-essential vim \
+ DEBIAN_FRONTEND=noninteractive apt-get install -y golang git cmake avahi-utils iputils-ping sudo build-essential vim \
  nano libopenmpi-dev libopenblas-dev libreadline-dev libffi-dev liblapack-dev libhdf5-openmpi-dev hdf5-tools \
   libfreetype6-dev openssl dropbear wget curl rsync psmisc procps i2c-tools gfortran gcc llvm \
  nodejs npm zip gpiod libtinfo5 libzmq3-dev  \
@@ -35,6 +35,7 @@ RUN apt-get update && \
  apt-get clean && \
  echo "Installed packages successfully."
 
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 RUN python3 get-pip.py --force-reinstall
 COPY --from=arch_loader /out/clang/ /usr/local/
@@ -90,6 +91,8 @@ COPY /app/ /app/
 ENV SHELL=/bin/bash
 ENV PATH="${PATH}:/home/dev/.local/bin"
 RUN echo "dev:dev" | chpasswd
+RUN usermod -aG i2c dev
+RUN addgroup gpio && usermod -aG gpio dev
 
 CMD [ "/bin/bash", "/app/progs_wrapper.sh" ]
 #CMD [ "/bin/bash", "-c", "sleep infinity" ]
