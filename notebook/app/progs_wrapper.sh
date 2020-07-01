@@ -1,8 +1,12 @@
 #!/bin/bash
 echo "running notebook"
 set -x
-#JUPYTERLAB_DIR=${JUPYTERLAB_DIR:=/home/dev/.local/share/jupyter/lab}
 VIM_USER=${VIM_USER:=0}
+#JUPYTERLAB_DIR=${JUPYTERLAB_DIR:=/home/dev/.local/share/jupyter/lab}
+if [ -e "${JUPYTERLAB_DIR_VIM}" ] && [ ! -z "${VIM_USER}" ] && [ "${VIM_USER}" -ne 0 ]; then 
+  JUPYTERLAB_DIR=${JUPYTERLAB_DIR_VIM}
+fi
+
 USER=$(stat -c '%U' /lab)
 if [ $USER != "dev" ]; then 
   chown -R dev:dev /lab 

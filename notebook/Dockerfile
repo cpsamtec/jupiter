@@ -62,7 +62,7 @@ RUN chmod +x /usr/local/bin/docker-compose && ln -s /usr/local/bin/docker-compos
 
 
 
-RUN pip3 install --upgrade jupyterlab-s3-browser jupyterlab-git jupyter-dash boto3 minio plotly dash qgrid \
+RUN pip3 install --upgrade dash-bootstrap-components jupyterlab-s3-browser jupyterlab-git jupyter-dash boto3 minio plotly dash qgrid \
     aioboto3 psutil  fastparquet requests 
  # h5py cannot find <mpi.h>
 RUN su - dev -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash"
