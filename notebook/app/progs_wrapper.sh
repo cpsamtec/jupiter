@@ -2,6 +2,8 @@
 echo "running notebook"
 set -x
 VIM_USER=${VIM_USER:=0}
+MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:=minioadmin}
+MINIO_SECRET_KEY=${MINIO_SECRET_KEY:=minioadmin}
 #JUPYTERLAB_DIR=${JUPYTERLAB_DIR:=/home/dev/.local/share/jupyter/lab}
 if [ -e "${JUPYTERLAB_DIR_VIM}" ] && [ ! -z "${VIM_USER}" ] && [ "${VIM_USER}" -ne 0 ]; then 
   JUPYTERLAB_DIR=${JUPYTERLAB_DIR_VIM}
@@ -51,7 +53,7 @@ if [ ! -f ${SSH_KEY_RSA} ]; then
 fi
 
 mc config host ls | grep -q myminio
-if [ $? -ne 0 ]; then
+if [ $? -ne 0 ] && [ ! -z $MINIO_ACCESS_KEY ] && [ ! -z $MINIO_SECRET_KEY ]; then
   su -w "MINIO_ACCESS_KEY,MINIO_SECRET_KEY" - dev -c "mc config host add myminio http://minio:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}"
 fi
 
@@ -83,9 +85,11 @@ if [ $status -ne 0 ]; then
   exit $status
 fi
 
-for f in $(ls /dev/i2c-*); do 
-  chown :i2c "$f"
-  chmod g+rw "$f"
+for f in /dev/i2c-*; do 
+  if [ -f "$f" ]; then 
+    chown :i2c "$f"
+    chmod g+rw "$f"
+  fi
 done
 if [ -e /dev/gpiomem ]; then 
   chown :gpio "/dev/gpiomem"
