@@ -93,6 +93,7 @@ ENV PATH="${PATH}:/home/dev/.local/bin"
 RUN echo "dev:dev" | chpasswd
 RUN usermod -aG i2c dev
 RUN addgroup gpio && usermod -aG gpio dev
+RUN echo 'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:${PATH}' > /etc/profile.d/01-path-fix.sh 
 
 CMD [ "/bin/bash", "/app/progs_wrapper.sh" ]
 #CMD [ "/bin/bash", "-c", "sleep infinity" ]

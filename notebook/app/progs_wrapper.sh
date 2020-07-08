@@ -59,7 +59,7 @@ fi
 
 # Start the first process
 cd /code
-su -w "CARGO_HOME,RUSTUP_HOME,BALENA_DEVICE_UUID" - dev -c "code-server --bind-addr 0.0.0.0:8080 /code &"
+su -w "PATH,CARGO_HOME,RUSTUP_HOME,BALENA_DEVICE_UUID" - dev -c "code-server --bind-addr 0.0.0.0:8080 /code &"
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start code-server: $status"
@@ -68,7 +68,7 @@ fi
 
 # Start the second process
 cd /lab
-su -w "JUPYTERLAB_DIR,BALENA_DEVICE_UUID" - dev  -c "cd /lab; jupyter notebook --no-browser --ip=* --port=8082 &"
+su -w "PATH,JUPYTERLAB_DIR,BALENA_DEVICE_UUID" - dev  -c "cd /lab; jupyter notebook --no-browser --ip=* --port=8082 &"
 #jupyter notebook --allow-root --no-browser --ip=* --port=8082 &
 status=$?
 if [ $status -ne 0 ]; then
@@ -78,7 +78,7 @@ fi
 
 # Start the third process
 echo "starting dropbear"
-/usr/sbin/dropbear &
+/usr/sbin/dropbear -g -r ${SSH_KEY_DSS} -r ${SSH_KEY_RSA} &
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start dropbear: $status"
