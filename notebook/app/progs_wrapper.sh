@@ -20,11 +20,13 @@ if [ ! -d /home/dev/.vscode-server ]; then
   echo "add default extensions in future"
 fi
 
-#if [ ! -e /home/dev/.jupyter-ext-installed ]; then
-  #su -w "JUPYTERLAB_DIR,VIM_USER" - dev -c "bash /app/jupyter-installs.sh"
-#fi
-
 if [ ! -e /home/dev/.code-server-ext-installed ]; then
+  su - dev -c 'git config --global credential.helper "cache --timeout=14400"'
+  su - dev -c 'echo "
+  if [ -e \"/var/run/balena.sock\" ]; then 
+    export DOCKER_HOST=unix:///var/run/balena.sock
+  fi
+  " >> /home/dev/.bashrc'
   su -w "VIM_USER" - dev -c "bash /app/code-server-installs.sh"
 fi
 
@@ -50,6 +52,12 @@ if [ ! -f ${SSH_KEY_RSA} ]; then
   dropbearkey  -t rsa -f ${SSH_KEY_RSA} -s 2048
   chown root:root ${SSH_KEY_RSA}
   chmod 600 ${SSH_KEY_RSA}
+fi
+
+
+if [ ! -f "/home/dev/.jupyter/jupyter_notebook_config.py" ]; then 
+  su -w "PATH" - dev -c "jupyter notebook --generate-config && 
+    sed -i 's/#c.FileContentsManager.delete_to_trash.*/c.FileContentsManager.delete_to_trash = False/' '/home/dev/.jupyter/jupyter_notebook_config.py'"
 fi
 
 mc config host ls | grep -q myminio

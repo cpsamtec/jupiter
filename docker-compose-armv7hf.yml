@@ -23,12 +23,11 @@ services:
     build: notebook
     privileged: true
     ports:
-      - "5020:5020"
-      - "8080:8080"
-      - "8082:8082"
-      - "28282:22"
-      - "8050:8050" # dash server
-      - "33000:33000" # spare
+      - "8080:8080" # http alt, spare
+      - "28282:22" # ssh
+      - "8050:8050" # dash server, spare
+      - "33000:33000" # spare 
+      - "34000:34000" # spare 
     environment:
       - UDEV=1
       - DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket

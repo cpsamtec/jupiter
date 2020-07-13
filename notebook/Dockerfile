@@ -94,6 +94,9 @@ RUN echo "dev:dev" | chpasswd
 RUN usermod -aG i2c dev
 RUN addgroup gpio && usermod -aG gpio dev
 RUN echo 'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:${PATH}' > /etc/profile.d/01-path-fix.sh 
+RUN addgroup docker --gid 988 && \
+  usermod -aG docker dev 
+  #ln -sf /var/run/docker.sock /var/run/balena.sock
 
 CMD [ "/bin/bash", "/app/progs_wrapper.sh" ]
 #CMD [ "/bin/bash", "-c", "sleep infinity" ]
