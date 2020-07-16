@@ -24,6 +24,7 @@ services:
     privileged: true
     ports:
       - "8080:8080" # http alt, spare
+      - "8888:8888" # jupyter notebook gw
       - "28282:22" # ssh
       - "8050:8050" # dash server, spare
       - "33000:33000" # spare 
