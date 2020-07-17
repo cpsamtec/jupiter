@@ -9,8 +9,8 @@ services:
       - PYTHON_ENV=production
       - APP_DATA_DIR=/data
       - APP_LOG_PATH=/tmp/logs
-      - ETH_DISABLE=0
-      - SDC_WIFI_TYPE=HOTSPOT
+      - ETH_DISABLE=1
+      - SDC_WIFI_TYPE=DISABLED
       #- APP_IMG_PATH=/img.png
     volumes:
       - 'logs-volume:/tmp/logs'
