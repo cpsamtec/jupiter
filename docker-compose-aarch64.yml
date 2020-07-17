@@ -1,15 +1,17 @@
 version: '2.0'
 services:
-  samtecdeviceshare:
-    build: samtecdeviceshare
+  sds:
+    build: sds
     ports:
       - "1337:1337"
       - "47546:47546"
     environment:
       - PYTHON_ENV=production
-      - APP_IMG_PATH=/img.png
       - APP_DATA_DIR=/data
       - APP_LOG_PATH=/tmp/logs
+      - ETH_DISABLE=0
+      - SDC_WIFI_TYPE=HOTSPOT
+      #- APP_IMG_PATH=/img.png
     volumes:
       - 'logs-volume:/tmp/logs'
       - 'resin-data:/data'
@@ -24,11 +26,11 @@ services:
     privileged: true
     ports:
       - "8080:8080" # http alt, spare
-      - "8888:8888" # jupyter notebook gw
       - "28282:22" # ssh
       - "8050:8050" # dash server, spare
       - "33000:33000" # spare 
       - "34000:34000" # spare 
+      #- "8888:8888" # jupyter notebook gw
     environment:
       - UDEV=1
       - DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
@@ -52,7 +54,7 @@ services:
   nginx:
     build: nginx
     depends_on: 
-      - samtecdeviceshare 
+      - sds 
       - notebook
       - minio
     ports:

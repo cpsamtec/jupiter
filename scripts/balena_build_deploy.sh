@@ -5,7 +5,7 @@ cd $DIR/..
 
 bash scripts/create-local-docker-compose.sh 
 
-SERVICES="samtecdeviceshare nginx notebook minio"
+SERVICES="sds nginx notebook minio"
 DEPLOY_ARCH=${DEPLOY_ARCH:='aarch64'}
 SYSTEM_ARCH=$(uname -m)
 BUILD_ARGS="BUILD_ARG BASE_IMAGE_ARCH=DOCKER_ARCH BUILD_ARG NOTEBOOK_BASE_IMAGE=DOCKER_ARCH/ubuntu:groovy BUILD_ARG SDS_BASE_IMAGE=DOCKER_ARCH/python:3.8-alpine"

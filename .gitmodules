@@ -1,5 +1,5 @@
 [submodule "samtecdeviceshare"]
-	path = samtecdeviceshare
+	path = sds/samtecdeviceshare
 	url = https://bitbucket.org/samteccmd/samtecdeviceshare.git
 [submodule "minio"]
 	path = minio
