@@ -1,9 +1,6 @@
 # Jupiter
 
-<img src="sds/img.png" alt="jupiter" width="200"  style="background-color:black"/>
-
 Development environment
-
 
 ## Get Repo
 
