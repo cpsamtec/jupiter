@@ -72,23 +72,22 @@ sub_build(){
     configure_arch
     if [ "$DEPLOY_ARCH" = 'aarch64' ]; then 
         if [ "$SYSTEM_ARCH" = 'x86_64' ]; then 
-            create_local_docker_aarch64
-            docker-compose -f docker-compose-aarch64.yml build ${COMPOSE_BUILD_ARGS} ${SERVICES} 
+            MINIO_DOCKERFILE=Dockerfile.arm64.release docker-compose build ${COMPOSE_BUILD_ARGS} ${SERVICES} 
         else
-            balena build --arch aarch64 ${BALENA_BUILD_ARGS} 
+            MINIO_DOCKERFILE=Dockerfile.arm64.release balena build --arch aarch64 ${BALENA_BUILD_ARGS} 
         fi
     elif [ "$DEPLOY_ARCH" = 'amd64' ]; then 
         if [ "$SYSTEM_ARCH" = 'x86_64' ]; then 
-            docker-compose --project-name jupyter-x86 build ${COMPOSE_BUILD_ARGS} ${SERVICES}
+            MINIO_DOCKERFILE=Dockerfile docker-compose --project-name jupyter-x86 build ${COMPOSE_BUILD_ARGS} ${SERVICES}
         else
-            balena build --projectName jupyter-x86 --arch amd64 ${BALENA_BUILD_ARGS} 
+            MINIO_DOCKERFILE=Dockerfile balena build --projectName jupyter-x86 --arch amd64 ${BALENA_BUILD_ARGS} 
         fi
     else #aarch32
         if [ "$SYSTEM_ARCH" = 'x86_64' ]; then 
             create_local_docker_aarch32
-            docker-compose -f docker-compose-aarch32.yml build ${BALENA_BUILD_ARGS} ${SERVICES}
+            MINIO_DOCKERFILE=Dockerfile.arm.release docker-compose -f docker-compose-aarch32.yml build ${BALENA_BUILD_ARGS} ${SERVICES}
         else 
-            balena build --arch armv7hf ${BALENA_BUILD_ARGS} 
+            MINIO_DOCKERFILE=Dockerfile.arm.release balena build --arch armv7hf ${BALENA_BUILD_ARGS} 
         fi
     fi
 }

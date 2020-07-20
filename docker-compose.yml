@@ -62,7 +62,7 @@ services:
   minio:
     build: 
       context: ./minio
-      #dockerfile: Dockerfile.arm64.release
+      dockerfile: ${MINIO_DOCKERFILE}
     ports:
       - "9000:9000"
     environment:
