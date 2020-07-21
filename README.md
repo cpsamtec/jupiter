@@ -149,4 +149,4 @@ The following tools have been installed and are ready to use.
 
 ## Docker
 
-On balena devices **/var/run/docker.sock** is exposed. The Jupiter environment also includes docker-compose. This means you can build and run containers from the Jupiter environment.
+On balena devices **/var/run/balena.sock** is exposed. The Jupiter environment also includes docker-compose. This means you can build and run containers from the Jupiter environment. The environment variable DOCKER_HOST will be preconfigured to use this **/var/run/balena.sock**
