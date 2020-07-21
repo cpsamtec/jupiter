@@ -11,10 +11,24 @@ git clone --recursive URL
 
 - **Balena**. This project has been prebuilt and uploaded to Balnea projects jupyter (arm64v8) and jupyter-x86 (amd64)
 
-- **Docker Compose** (build and run locally)
-  1. source scripts/env.sh
-  2. bash scripts/jupiter.sh build (build images)
-  3. run docker-compose up, down ... commands as usual inside the repo directory
+- **Docker Compose** (build and run on your machine)
+
+  1. get project environment variables from scripts/env.sh
+   
+   ```bash
+        source scripts/env.sh
+    ```
+
+  2. build project images using scripts/jupiter.sh
+
+  ```bash
+    # x86
+    bash scripts/jupiter.sh build amd64
+    # arm64v8
+    bash scripts/jupiter.sh build arm64
+  ```
+
+  3. now the images are built run docker-compose up, down, exec ... commands as usual inside the repo directory. Make sure if you open a new terminal to source **scripts/env.sh**
 
 ## Jupiter Environment
 
