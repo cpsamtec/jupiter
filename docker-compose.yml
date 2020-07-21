@@ -1,4 +1,4 @@
-version: '2.0'
+version: '2.1'
 services:
   sds:
     build: sds
@@ -63,7 +63,7 @@ services:
   minio:
     build: 
       context: ./minio
-      dockerfile: ${MINIO_DOCKERFILE}
+      dockerfile: ${MINIO_DOCKERFILE:-Dockerfile}
     ports:
       - "9000:9000"
     environment:

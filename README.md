@@ -150,3 +150,11 @@ The following tools have been installed and are ready to use.
 ## Docker
 
 On balena devices **/var/run/balena.sock** is exposed. The Jupiter environment also includes docker-compose. This means you can build and run containers from the Jupiter environment. The environment variable DOCKER_HOST will be preconfigured to use this **/var/run/balena.sock**
+
+Run directly on your machine with docker-compose you can expose the docker.sock to the environment by running
+
+```bash
+docker-compose  -f docker-compose.yml -f docker-compose-local-sock.yml up
+```
+
+The overriding dockerfile mounts the appropriate docker.sock volume. You can create your own overriding docker-compose files to change ports and passwords.
