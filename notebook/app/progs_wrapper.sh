@@ -10,25 +10,36 @@ fi
 USER=$(stat -c '%U' /lab)
 if [ $USER != "dev" ]; then 
   chown -R dev:dev /lab 
+fi
 USER=$(stat -c '%U' /code)
 if [ $USER != "dev" ]; then 
   chown -R dev:dev /code
+fi
 USER=$(stat -c '%U' /home/dev)
 if [ $USER != "dev" ]; then 
   chown -R dev:dev /home/dev 
 fi
 
-if [ ! -e /program/jupiter_config_version ] || [ $(cat /program/jupiter_config_version) -ne 1 ]; then
+CONFIG_VERSION=2
+if [ ! -e /program/.jupiter/jupiter_config_version ] || [ $(cat /program/.jupiter/jupiter_config_version) -ne $CONFIG_VERSION ]; then
+  mkdir -p /program/.jupiter
   su - dev -c 'git config --global credential.helper "cache --timeout=14400"'
   su - dev -c 'echo "
   if [ -e \"/var/run/balena.sock\" ]; then 
     export DOCKER_HOST=unix:///var/run/balena.sock
   fi
   " >> /home/dev/.bashrc'
-  su -w "JUPI_MINIO_ACCESS_KEY,JUPI_MINIO_SECRET_KEY,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY" - dev -c "bash ${DIR}/minio_config.sh"
-  su -w "VIM_USER" - dev -c "bash /app/code-server-installs.sh"
-  echo 1 > /program/jupiter_config_version
+  su -w "VIM_USER" - dev -c "bash ${DIR}/code-server-installs.sh"
+  echo $CONFIG_VERSION > /program/.jupiter/jupiter_config_version
   sync
+fi
+
+if [ ! -e /program/.jupiter/jupiter_credential_version ] || [ $(cat /program/.jupiter/jupiter_credential_version) -ne $JUPI_CREDENTIAL_VERSION ]; then
+  mkdir -p /program/.jupiter
+  su -w "JUPI_MINIO_ACCESS_KEY,JUPI_MINIO_SECRET_KEY,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY" - dev -c "bash ${DIR}/minio_config.sh"
+  bash ${DIR}/credentials.sh > /tmp/credentials.txt && chown dev:dev /tmp/credentials.txt
+  su - dev -c "mc mb -p myminio/system && mc cp /tmp/credentials.txt myminio/system" 
+  echo $JUPI_CREDENTIAL_VERSION > /program/.jupiter/jupiter_credential_version
 fi
 
 CONF_DIR="/program/dropbear"
@@ -99,6 +110,8 @@ if [ -e /dev/gpiomem ]; then
   chmod g+rw "/dev/gpiomem"
 fi
 
+bash ${DIR}/credentials.sh > /tmp/credentials.txt && chown dev:dev /tmp/credentials.txt
+su - dev -c "mc cp /tmp/credentials.txt myminio/system" 
 
 while sleep 60; do
   ps aux |grep code-server | grep -q -v grep

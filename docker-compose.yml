@@ -34,9 +34,12 @@ services:
       - UDEV=1
       - DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
       - VIM_USER=0
-      - AWS_ACCESS_KEY_ID="${JUPI_AWS_ACCESS_KEY_ID}"
-      - AWS_SECRET_ACCESS_KEY="${JUPI_AWS_SECRET_ACCESS_KEY}"
+      - JUPI_CREDENTIAL_VERSION=${JUPI_CREDENTIAL_VERSION:-1}
+      - JUPI_AWS_ACCESS_KEY_ID=${JUPI_AWS_ACCESS_KEY_ID}
+      - JUPI_AWS_SECRET_ACCESS_KEY=${JUPI_AWS_SECRET_ACCESS_KEY}
       - JUPI_USER_PASSWORD=${JUPI_USER_PASSWORD:-dev}
+      - JUPI_MYMINIO_ACCESS_KEY=${JUPI_MYMINIO_ACCESS_KEY:-minioadmin}
+      - JUPI_MYMINIO_SECRET_KEY=${JUPI_MYMINIO_SECRET_KEY:-minioadmin}
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
       - "/dev/mem:/dev/mem"
@@ -58,22 +61,22 @@ services:
     depends_on: 
       - sds 
       - notebook
-      - minio
+      - myminio
     ports:
       - 80:80
-  minio:
+  myminio:
     build: 
       context: ./minio
-      dockerfile: ${JUPI_MINIO_DOCKERFILE:-Dockerfile}
+      dockerfile: ${MYMINIO_DOCKERFILE}
     ports:
       - "9000:9000"
     environment:
       - APP_LOG_PATH=/tmp/logs
-      - JUPI_MINIO_ACCESS_KEY="${JUPI_MINIO_ACCESS_KEY:-minioadmin}"
-      - JUPI_MINIO_SECRET_KEY="${JUPI_MINIO_SECRET_KEY:-minioadmin}"
+      - MINIO_ACCESS_KEY=${JUPI_MYMINIO_ACCESS_KEY:-minioadmin}
+      - MINIO_SECRET_KEY=${JUPI_MYMINIO_SECRET_KEY:-minioadmin}
     volumes:
-      - 'minio-data:/data'
-      - 'minio-program:/program'
+      - 'myminio-data:/data'
+      - 'myminio-program:/program'
     command: ["minio", "server", "/storage", "--certs-dir", "/program/minio"]
 volumes:
      logs-volume: 
@@ -81,8 +84,8 @@ volumes:
      nb-code:
      nb-lab:
      nb-home:
-     minio-program:
-     minio-data:
+     myminio-program:
+     myminio-data:
 
 
 

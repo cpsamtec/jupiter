@@ -16,16 +16,16 @@ git clone --recursive URL
   1. get project environment variables from scripts/env.sh
    
    ```bash
-        source scripts/env.sh
+        source scripts/compose-env.sh
     ```
 
   2. build project images using scripts/jupiter.sh
 
   ```bash
-    # x86
+    # x86_64
     bash scripts/jupiter.sh build amd64
     # arm64v8
-    bash scripts/jupiter.sh build arm64
+    bash scripts/jupiter.sh build aarch64
   ```
 
   3. now the images are built run docker-compose up, down, exec ... commands as usual inside the repo directory. Make sure if you open a new terminal to source **scripts/env.sh**
@@ -144,16 +144,16 @@ Further client documentation can be found here
 A web client can be found using a web browser going to
 
 - On same local network
-  - http://ip/minio
+  - http://ip/myminio
   - http://ip:9000
     (ip can be 7 digit balena device uuid.local or actual ip)
 - Remote/Local running on a balena device only with internet access
-  - https://[balena-device-id].balena-devices.com/minio
+  - https://[balena-device-id].balena-devices.com/myminio
 
 Credentials can be found in environment keys
 
-- MINIO_ACCESS_KEY: default minioadmin
-- MINIO_SECRET_KEY: default minioadmin
+- JUPI_MINIO_ACCESS_KEY: default minioadmin
+- JUPI_MINIO_SECRET_KEY: default minioadmin
 
 ## Software Tools
 
