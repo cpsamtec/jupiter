@@ -14,7 +14,6 @@ services:
       #- APP_IMG_PATH=/img.png
     volumes:
       - 'logs-volume:/tmp/logs'
-      - 'resin-data:/data'
       #- '/var/run/docker.sock:/var/run/docker.sock'
       #- '/var/run/balena.sock:/var/run/docker.sock'
     labels:
@@ -35,6 +34,9 @@ services:
       - UDEV=1
       - DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
       - VIM_USER=0
+      - AWS_ACCESS_KEY_ID="${JUPI_AWS_ACCESS_KEY_ID}"
+      - AWS_SECRET_ACCESS_KEY="${JUPI_AWS_SECRET_ACCESS_KEY}"
+      - JUPI_USER_PASSWORD=${JUPI_USER_PASSWORD:-dev}
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
       - "/dev/mem:/dev/mem"
@@ -47,7 +49,6 @@ services:
       io.balena.features.kernel-modules: '1'
     volumes:
       - 'logs-volume:/tmp/logs'
-      - 'resin-data:/data'
       - 'nb-lab:/lab'
       - 'nb-code:/code'
       - 'nb-program:/program'
@@ -59,30 +60,29 @@ services:
       - notebook
       - minio
     ports:
-      - "80:80"
+      - 80:80
   minio:
     build: 
       context: ./minio
-      dockerfile: ${MINIO_DOCKERFILE:-Dockerfile}
+      dockerfile: ${JUPI_MINIO_DOCKERFILE:-Dockerfile}
     ports:
       - "9000:9000"
     environment:
       - APP_LOG_PATH=/tmp/logs
-      #- MINIO_ACCESS_KEY
-      #- MINIO_SECRET_KEY
+      - JUPI_MINIO_ACCESS_KEY="${JUPI_MINIO_ACCESS_KEY:-minioadmin}"
+      - JUPI_MINIO_SECRET_KEY="${JUPI_MINIO_SECRET_KEY:-minioadmin}"
     volumes:
-      - 'storage:/data'
+      - 'minio-data:/data'
       - 'minio-program:/program'
     command: ["minio", "server", "/storage", "--certs-dir", "/program/minio"]
 volumes:
      logs-volume: 
-     resin-data: 
      nb-program:
      nb-code:
      nb-lab:
      nb-home:
      minio-program:
-     storage:
+     minio-data:
 
 
 

@@ -1,10 +1,8 @@
 #!/bin/bash
 echo "running notebook"
 set -x
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 VIM_USER=${VIM_USER:=0}
-MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:=minioadmin}
-MINIO_SECRET_KEY=${MINIO_SECRET_KEY:=minioadmin}
-#JUPYTERLAB_DIR=${JUPYTERLAB_DIR:=/home/dev/.local/share/jupyter/lab}
 if [ -e "${JUPYTERLAB_DIR_VIM}" ] && [ ! -z "${VIM_USER}" ] && [ "${VIM_USER}" -ne 0 ]; then 
   JUPYTERLAB_DIR=${JUPYTERLAB_DIR_VIM}
 fi
@@ -12,22 +10,25 @@ fi
 USER=$(stat -c '%U' /lab)
 if [ $USER != "dev" ]; then 
   chown -R dev:dev /lab 
-  chown -R dev:dev /code 
+USER=$(stat -c '%U' /code)
+if [ $USER != "dev" ]; then 
+  chown -R dev:dev /code
+USER=$(stat -c '%U' /home/dev)
+if [ $USER != "dev" ]; then 
   chown -R dev:dev /home/dev 
 fi
 
-if [ ! -d /home/dev/.vscode-server ]; then 
-  echo "add default extensions in future"
-fi
-
-if [ ! -e /home/dev/.code-server-ext-installed ]; then
+if [ ! -e /program/jupiter_config_version ] || [ $(cat /program/jupiter_config_version) -ne 1 ]; then
   su - dev -c 'git config --global credential.helper "cache --timeout=14400"'
   su - dev -c 'echo "
   if [ -e \"/var/run/balena.sock\" ]; then 
     export DOCKER_HOST=unix:///var/run/balena.sock
   fi
   " >> /home/dev/.bashrc'
+  su -w "JUPI_MINIO_ACCESS_KEY,JUPI_MINIO_SECRET_KEY,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY" - dev -c "bash ${DIR}/minio_config.sh"
   su -w "VIM_USER" - dev -c "bash /app/code-server-installs.sh"
+  echo 1 > /program/jupiter_config_version
+  sync
 fi
 
 CONF_DIR="/program/dropbear"
@@ -54,20 +55,14 @@ if [ ! -f ${SSH_KEY_RSA} ]; then
   chmod 600 ${SSH_KEY_RSA}
 fi
 
-
 if [ ! -f "/home/dev/.jupyter/jupyter_notebook_config.py" ]; then 
   su -w "PATH" - dev -c "jupyter notebook --generate-config && 
     sed -i 's/#c.FileContentsManager.delete_to_trash.*/c.FileContentsManager.delete_to_trash = False/' '/home/dev/.jupyter/jupyter_notebook_config.py'"
 fi
 
-mc config host ls | grep -q myminio
-if [ $? -ne 0 ] && [ ! -z $MINIO_ACCESS_KEY ] && [ ! -z $MINIO_SECRET_KEY ]; then
-  su -w "MINIO_ACCESS_KEY,MINIO_SECRET_KEY" - dev -c "mc config host add myminio http://minio:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}"
-fi
-
 # Start the first process
 cd /code
-su -w "PATH,CARGO_HOME,RUSTUP_HOME,BALENA_DEVICE_UUID" - dev -c "code-server --bind-addr 0.0.0.0:8080 /code &"
+su -w "JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,CARGO_HOME,RUSTUP_HOME,BALENA_DEVICE_UUID" - dev -c "code-server --bind-addr 0.0.0.0:8080 /code &"
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start code-server: $status"
@@ -76,7 +71,7 @@ fi
 
 # Start the second process
 cd /lab
-su -w "PATH,JUPYTERLAB_DIR,BALENA_DEVICE_UUID" - dev  -c "cd /lab; jupyter notebook --no-browser --ip=* --port=8082 &"
+su -w "JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,JUPYTERLAB_DIR,BALENA_DEVICE_UUID" - dev  -c "cd /lab; jupyter notebook --no-browser --ip=* --port=8082 &"
 #jupyter notebook --allow-root --no-browser --ip=* --port=8082 &
 status=$?
 if [ $status -ne 0 ]; then

@@ -5,11 +5,28 @@ cd $DIR/..
 
 #Initialize globals
 SERVICES="sds nginx notebook minio"
-DEPLOY_ARCH=${DEPLOY_ARCH:='aarch64'}
 SYSTEM_ARCH=$(uname -m)
 BUILD_ARGS="BUILD_ARG BASE_IMAGE_ARCH=DOCKER_ARCH BUILD_ARG NOTEBOOK_BASE_IMAGE=DOCKER_ARCH/ubuntu:groovy BUILD_ARG SDS_BASE_IMAGE=DOCKER_ARCH/python:3.8-alpine"
 COMPOSE_BUILD_ARGS=${BUILD_ARGS//BUILD_ARG/--build-arg}
 BALENA_BUILD_ARGS=${BUILD_ARGS//BUILD_ARG/-B}
+
+# if DEPLOY_ARCH not specified default to system. can be overriden with parameter
+if [ -z $DEPLOY_ARCH ]; then 
+    case $SYSTEM_ARCH in
+        "aarch64")
+            DEPLOY_ARCH="aarch64"
+            ;;
+        "aarch32")
+            DEPLOY_ARCH="aarch32"
+            ;;
+        "x86_64")
+            DEPLOY_ARCH=amd64
+            ;;
+        *)
+            DEPLOY_ARCH=amd64
+            ;;
+    esac
+fi
 
 create_local_docker_aarch64() {
     cat docker-compose.yml | sed 's/#dockerfile/dockerfile/' > docker-compose-aarch64.yml
@@ -65,29 +82,37 @@ sub_build(){
             DEPLOY_ARCH="${sub_option}"
             echo "building ${DEPLOY_ARCH}"
             ;;
-        *)
+        "")
             echo "building ${DEPLOY_ARCH}"
+            ;;
+        *)
+            echo "invalid build architecture ${DEPLOY_ARCH}"
+            echo "valid include - amd64 | aarch64 | aarch32" 
+            exit 1
             ;;
     esac
     configure_arch
     if [ "$DEPLOY_ARCH" = 'aarch64' ]; then 
-        if [ "$SYSTEM_ARCH" = 'x86_64' ]; then 
-            MINIO_DOCKERFILE=Dockerfile.arm64.release docker-compose build ${COMPOSE_BUILD_ARGS} ${SERVICES} 
+        if command -v docker-compose &> /dev/null; then
+        #if [ "$SYSTEM_ARCH" = 'x86_64' ]; then 
+            JUPI_MINIO_DOCKERFILE=Dockerfile.arm64.release docker-compose build ${COMPOSE_BUILD_ARGS} ${SERVICES} 
         else
-            MINIO_DOCKERFILE=Dockerfile.arm64.release balena build --arch aarch64 ${BALENA_BUILD_ARGS} 
+            JUPI_MINIO_DOCKERFILE=Dockerfile.arm64.release balena build --arch aarch64 ${BALENA_BUILD_ARGS} 
         fi
     elif [ "$DEPLOY_ARCH" = 'amd64' ]; then 
-        if [ "$SYSTEM_ARCH" = 'x86_64' ]; then 
-            MINIO_DOCKERFILE=Dockerfile docker-compose --project-name jupyter-x86 build ${COMPOSE_BUILD_ARGS} ${SERVICES}
+        if command -v docker-compose &> /dev/null; then
+        #if [ "$SYSTEM_ARCH" = 'x86_64' ]; then 
+            JUPI_MINIO_DOCKERFILE=Dockerfile docker-compose --project-name jupyter-x86 build ${COMPOSE_BUILD_ARGS} ${SERVICES}
         else
-            MINIO_DOCKERFILE=Dockerfile balena build --projectName jupyter-x86 --arch amd64 ${BALENA_BUILD_ARGS} 
+            JUPI_MINIO_DOCKERFILE=Dockerfile balena build --projectName jupyter-x86 --arch amd64 ${BALENA_BUILD_ARGS} 
         fi
     else #aarch32
-        if [ "$SYSTEM_ARCH" = 'x86_64' ]; then 
+        if command -v docker-compose &> /dev/null; then
+        #if [ "$SYSTEM_ARCH" = 'x86_64' ]; then 
             create_local_docker_aarch32
-            MINIO_DOCKERFILE=Dockerfile.arm.release docker-compose -f docker-compose-aarch32.yml build ${BALENA_BUILD_ARGS} ${SERVICES}
+            JUPI_MINIO_DOCKERFILE=Dockerfile.arm.release docker-compose -f docker-compose-aarch32.yml build ${BALENA_BUILD_ARGS} ${SERVICES}
         else 
-            MINIO_DOCKERFILE=Dockerfile.arm.release balena build --arch armv7hf ${BALENA_BUILD_ARGS} 
+            JUPI_MINIO_DOCKERFILE=Dockerfile.arm.release balena build --arch armv7hf ${BALENA_BUILD_ARGS} 
         fi
     fi
 }
@@ -110,8 +135,13 @@ sub_deploy(){
             DEPLOY_ARCH="${sub_option}"
             echo "deploying ${DEPLOY_ARCH}"
             ;;
-        *)
+        "")
             echo "deploying ${DEPLOY_ARCH}"
+            ;;
+        *)
+            echo "invalid deploy architecture ${DEPLOY_ARCH}"
+            echo "valid include - amd64 | aarch64 | aarch32" 
+            exit 1
             ;;
     esac
     configure_arch

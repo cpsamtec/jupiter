@@ -150,6 +150,11 @@ A web client can be found using a web browser going to
 - Remote/Local running on a balena device only with internet access
   - https://[balena-device-id].balena-devices.com/minio
 
+Credentials can be found in environment keys
+
+- MINIO_ACCESS_KEY: default minioadmin
+- MINIO_SECRET_KEY: default minioadmin
+
 ## Software Tools
 
 The following tools have been installed and are ready to use.
