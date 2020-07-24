@@ -83,7 +83,7 @@ By default a hotspot is created on wifi enabled devices. Look for WIFI network w
 
 ### Jupyter Lab
 
-Extensions have been installed and only need to be enabled. Do not install any further extensions as it will require a full rebuild and always causes problems. If VIM_USER is set to 1 vim will be enabled on notebook cells.
+Extensions have been installed and only need to be enabled. Do not install any further extensions as it will require a full rebuild and always causes problems. If JUPI_VIM_USER is set to 1 vim will be enabled on notebook cells.
 
 From a browser goto
 
@@ -144,7 +144,7 @@ Further client documentation can be found here
 A web client can be found using a web browser going to
 
 - On same local network
-  - http://ip/myminio
+  - http://ip/minio
   - http://ip:9000
     (ip can be 7 digit balena device uuid.local or actual ip)
 - Remote/Local running on a balena device only with internet access
@@ -152,8 +152,13 @@ A web client can be found using a web browser going to
 
 Credentials can be found in environment keys
 
-- JUPI_MINIO_ACCESS_KEY: default minioadmin
-- JUPI_MINIO_SECRET_KEY: default minioadmin
+- JUPI_MYMINIO_ACCESS_KEY: default minioadmin
+- JUPI_MYMINIO_SECRET_KEY: default minioadmin
+
+If the following credentials are set the minio client can be used on s3 (example mc ls s3/)
+
+- JUPI_AWS_ACCESS_KEY_ID
+- JUPI_AWS_SECRET_ACCESS_KEY
 
 ## Software Tools
 
@@ -170,10 +175,35 @@ The following tools have been installed and are ready to use.
 
 On balena devices **/var/run/balena.sock** is exposed. The Jupiter environment also includes docker-compose. This means you can build and run containers from the Jupiter environment. The environment variable DOCKER_HOST will be preconfigured to use this **/var/run/balena.sock**
 
-Run directly on your machine with docker-compose you can expose the docker.sock to the environment by running
+When running directly on your machine with docker-compose you can expose the docker.sock to the environment by running
 
 ```bash
 docker-compose  -f docker-compose.yml -f docker-compose-local-sock.yml up
 ```
 
 The overriding dockerfile mounts the appropriate docker.sock volume. You can create your own overriding docker-compose files to change ports and passwords.
+
+## Environment Variables
+
+For service notebook
+
+- Enable/Disable VIM mode and extensions in Jupyter Lab and Code Server. 0 - Disabled (default), 1 - Enabled
+    - JUPI_VIM_USER
+- Enable minio client to access AWS S3. (ex. mc ls s3/)
+    - JUPI_AWS_ACCESS_KEY_ID
+    - JUPI_AWS_SECRET_ACCESS_KEY
+- If credentials are changed (s3 or myminio) increase this value so the new ones are configured to be used in the environment. Default 1
+    - JUPI_CREDENTIAL_VERSION
+- Change the build time user password for dev
+    - JUPI_DEFAULT_USER_PASSWORD
+- Change the runtime user password for dev. Will be different than what is in generated image
+    - JUPI_OVERRIDE_USER_PASSWORD
+- Change the myminio default passwords
+    - JUPI_MYMINIO_ACCESS_KEY
+    - JUPI_MYMINIO_SECRET_KEY
+
+For service myminio
+
+- Change the myminio default passwords. Make sure these match JUPI_AWS_ACCESS_KEY_ID and  JUPI_AWS_SECRET_ACCESS_KEY
+    - MINIO_ACCESS_KEY
+    - MYMINIO_SECRET_KEY

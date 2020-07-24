@@ -1,9 +1,10 @@
 #!/bin/bash
 echo "running notebook"
 set -x
+printenv 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-VIM_USER=${VIM_USER:=0}
-if [ -e "${JUPYTERLAB_DIR_VIM}" ] && [ ! -z "${VIM_USER}" ] && [ "${VIM_USER}" -ne 0 ]; then 
+JUPI_VIM_USER=${JUPI_VIM_USER:=0}
+if [ -e "${JUPYTERLAB_DIR_VIM}" ] && [ ! -z "${JUPI_VIM_USER}" ] && [ "${JUPI_VIM_USER}" -ne 0 ]; then 
   JUPYTERLAB_DIR=${JUPYTERLAB_DIR_VIM}
 fi
 
@@ -21,7 +22,7 @@ if [ $USER != "dev" ]; then
 fi
 
 CONFIG_VERSION=2
-if [ ! -e /program/.jupiter/jupiter_config_version ] || [ $(cat /program/.jupiter/jupiter_config_version) -ne $CONFIG_VERSION ]; then
+if [ ! -e /program/.jupiter/jupiter_config_version ] || [ $(cat /program/.jupiter/jupiter_config_version) != $CONFIG_VERSION ]; then
   mkdir -p /program/.jupiter
   su - dev -c 'git config --global credential.helper "cache --timeout=14400"'
   su - dev -c 'echo "
@@ -29,17 +30,24 @@ if [ ! -e /program/.jupiter/jupiter_config_version ] || [ $(cat /program/.jupite
     export DOCKER_HOST=unix:///var/run/balena.sock
   fi
   " >> /home/dev/.bashrc'
-  su -w "VIM_USER" - dev -c "bash ${DIR}/code-server-installs.sh"
+  su -w "JUPI_VIM_USER" - dev -c "bash ${DIR}/code-server-installs.sh"
   echo $CONFIG_VERSION > /program/.jupiter/jupiter_config_version
   sync
 fi
 
-if [ ! -e /program/.jupiter/jupiter_credential_version ] || [ $(cat /program/.jupiter/jupiter_credential_version) -ne $JUPI_CREDENTIAL_VERSION ]; then
+SYSTEM_CREDENTIAL_VERION=1
+USER_CREDENTIAL_VERSION=${JUPI_CREDENTIAL_VERSION:-1}
+SYSTEM_CREDENTIAL_VERION="${SYSTEM_CREDENTIAL_VERION}-${USER_CREDENTIAL_VERSION}"
+
+if [ ! -e /program/.jupiter/jupiter_credential_version ] || [ $(cat /program/.jupiter/jupiter_credential_version) != $SYSTEM_CREDENTIAL_VERION ]; then
   mkdir -p /program/.jupiter
-  su -w "JUPI_MINIO_ACCESS_KEY,JUPI_MINIO_SECRET_KEY,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY" - dev -c "bash ${DIR}/minio_config.sh"
-  bash ${DIR}/credentials.sh > /tmp/credentials.txt && chown dev:dev /tmp/credentials.txt
-  su - dev -c "mc mb -p myminio/system && mc cp /tmp/credentials.txt myminio/system" 
-  echo $JUPI_CREDENTIAL_VERSION > /program/.jupiter/jupiter_credential_version
+  su -w "JUPI_MYMINIO_ACCESS_KEY,JUPI_MYMINIO_SECRET_KEY,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY" - dev -c "bash ${DIR}/minio_config.sh"
+  su - dev -c "mc mb -p myminio/jupiter" 
+  echo "$JUPI_CREDENTIAL_VERSION" > /program/.jupiter/jupiter_credential_version
+fi
+
+if [ ! -z ${JUPI_OVERRIDE_USER_PASSWORD} ] && [ ${JUPI_OVERRIDE_USER_PASSWORD} != ${JUPI_DEFAULT_USER_PASSWORD} ]; then 
+  echo "dev:${JUPI_OVERRIDE_USER_PASSWORD}" | chpasswd
 fi
 
 CONF_DIR="/program/dropbear"
@@ -110,8 +118,9 @@ if [ -e /dev/gpiomem ]; then
   chmod g+rw "/dev/gpiomem"
 fi
 
-bash ${DIR}/credentials.sh > /tmp/credentials.txt && chown dev:dev /tmp/credentials.txt
-su - dev -c "mc cp /tmp/credentials.txt myminio/system" 
+sleep 5
+su - dev -c "bash ${DIR}/credentials.sh > /tmp/credentials.txt"
+su - dev -c "mc cp /tmp/credentials.txt myminio/jupiter" 
 
 while sleep 60; do
   ps aux |grep code-server | grep -q -v grep
