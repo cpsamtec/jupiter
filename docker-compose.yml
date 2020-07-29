@@ -30,17 +30,19 @@ services:
       - "33000:33000" # spare 
       - "34000:34000" # spare 
       - "8888:8888" # jupyter notebook  local
+    env_file: 
+      - .env
     environment:
       - UDEV=1
-      - DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
-      - JUPI_VIM_USER=0
-      - JUPI_CREDENTIAL_VERSION=${JUPI_CREDENTIAL_VERSION:-1}
-      - JUPI_AWS_ACCESS_KEY_ID=${JUPI_AWS_ACCESS_KEY_ID}
-      - JUPI_AWS_SECRET_ACCESS_KEY=${JUPI_AWS_SECRET_ACCESS_KEY}
-      - JUPI_DEFAULT_USER_PASSWORD=${JUPI_DEFAULT_USER_PASSWORD:-dev}
-      - JUPI_OVERRIDE_USER_PASSWORD=${JUPI_OVERRIDE_USER_PASSWORD:-dev}
-      - JUPI_MYMINIO_ACCESS_KEY=${JUPI_MYMINIO_ACCESS_KEY:-minioadmin}
-      - JUPI_MYMINIO_SECRET_KEY=${JUPI_MYMINIO_SECRET_KEY:-minioadmin}
+      - DBUS_SYSTEM_BUS_ADDRESS:unix:path=/host/run/dbus/system_bus_socket
+      #- JUPI_VIM_USER 
+      #- JUPI_CREDENTIAL_VERSION
+      #- JUPI_AWS_ACCESS_KEY_ID
+      #- JUPI_AWS_SECRET_ACCESS_KEY
+      #- JUPI_DEFAULT_USER_PASSWORD
+      #- JUPI_OVERRIDE_USER_PASSWORD
+      #- JUPI_MYMINIO_ACCESS_KEY
+      #- JUPI_MYMINIO_SECRET_KEY
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
       - "/dev/mem:/dev/mem"
@@ -71,14 +73,16 @@ services:
       dockerfile: ${MYMINIO_DOCKERFILE}
     ports:
       - "9000:9000"
-    environment:
-      - APP_LOG_PATH=/tmp/logs
-      - MINIO_ACCESS_KEY=${JUPI_MYMINIO_ACCESS_KEY:-minioadmin}
-      - MINIO_SECRET_KEY=${JUPI_MYMINIO_SECRET_KEY:-minioadmin}
+    env_file: 
+      - .env
+    #environment:
+      #- MINIO_ACCESS_KEY: 
+      #- MINIO_SECRET_KEY: 
     volumes:
       - 'myminio-data:/data'
       - 'myminio-program:/program'
-    command: ["minio", "server", "/storage", "--certs-dir", "/program/minio"]
+    entrypoint: ["env", "MINIO_ACCESS_KEY=${JUPI_MYMINIO_ACCESS_KEY}", "env", "MINIO_SECRET_KEY=${JUPI_MYMINIO_SECRET_KEY}", "/usr/bin/docker-entrypoint.sh"]
+    command: ["minio", "server", "/data", "--certs-dir", "/program/minio"]
 volumes:
      logs-volume: 
      nb-program:

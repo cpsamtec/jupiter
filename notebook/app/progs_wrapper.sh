@@ -61,6 +61,14 @@ if [ ! -d ${CONF_DIR} ]; then
   chmod 755 ${CONF_DIR}
 fi
 
+if [ ! -d /home/dev/.ssh ]; then 
+  mkdir -p /home/dev/.ssh 
+  chmod 700 /home/dev/.ssh
+  touch /home/dev/.ssh/authorized_keys
+  chmod 600 /home/dev/.ssh/authorized_keys
+  chown -R dev:dev /home/dev/.ssh
+fi
+
 # Check if keys exists
 if [ ! -f ${SSH_KEY_DSS} ]; then
   dropbearkey  -t dss -f ${SSH_KEY_DSS}
@@ -88,6 +96,7 @@ if [ $status -ne 0 ]; then
   exit $status
 fi
 
+
 # Start the second process
 cd /lab
 su -w "JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,JUPYTERLAB_DIR,BALENA_DEVICE_UUID" - dev  -c "cd /lab; jupyter notebook --no-browser --ip=* --port=8082 &"
@@ -108,7 +117,7 @@ if [ $status -ne 0 ]; then
 fi
 
 for f in /dev/i2c-*; do 
-  if [ -f "$f" ]; then 
+  if [ -e "$f" ]; then 
     chown :i2c "$f"
     chmod g+rw "$f"
   fi
@@ -118,7 +127,7 @@ if [ -e /dev/gpiomem ]; then
   chmod g+rw "/dev/gpiomem"
 fi
 
-sleep 5
+sleep 20
 su - dev -c "bash ${DIR}/credentials.sh > /tmp/credentials.txt"
 su - dev -c "mc cp /tmp/credentials.txt myminio/jupiter" 
 

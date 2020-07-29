@@ -5,16 +5,27 @@ Containerized development environment
 
 ## Get Repo
 
-git clone --recursive URL
+1. git clone --recursive URL
+
+2. create a **.env** file in the root directory with the following contents
+
+```bash
+JUPI_VIM_USER=0
+JUPI_DEFAULT_USER_PASSWORD=dev
+JUPI_OVERRIDE_USER_PASSWORD=dev
+JUPI_CREDENTIAL_VERSION=1
+JUPI_MYMINIO_ACCESS_KEY=minioadmin
+JUPI_MYMINIO_SECRET_KEY=minioadmin
+```
 
 ## Running
 
-- **Balena**. This project has been prebuilt and uploaded to Balnea projects jupyter (arm64v8) and jupyter-x86 (amd64)
+- **Balena**. This project has been prebuilt and uploaded to Balnea projects jupiter-aarch64 (arm64v8) and jupiter-amd64 (amd64)
 
 - **Docker Compose** (build and run on your machine)
 
   1. get project environment variables from scripts/env.sh
-   
+
    ```bash
         source scripts/compose-env.sh
     ```
@@ -198,12 +209,6 @@ For service notebook
     - JUPI_DEFAULT_USER_PASSWORD
 - Change the runtime user password for dev. Will be different than what is in generated image
     - JUPI_OVERRIDE_USER_PASSWORD
-- Change the myminio default passwords
+- Change the myminio default passwords. Make sure greater than 8 characters
     - JUPI_MYMINIO_ACCESS_KEY
     - JUPI_MYMINIO_SECRET_KEY
-
-For service myminio
-
-- Change the myminio default passwords. Make sure these match JUPI_AWS_ACCESS_KEY_ID and  JUPI_AWS_SECRET_ACCESS_KEY
-    - MINIO_ACCESS_KEY
-    - MYMINIO_SECRET_KEY

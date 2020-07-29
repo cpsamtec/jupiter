@@ -33,3 +33,6 @@ RUN \
 RUN rm -rf /usr/local/lib/python3.8/test
 
 CMD [ "python3.8", "-m", "samtecdeviceshare.server" ]
+#CMD ["uvicorn", "samtecdeviceshare.server:app", "--root-path", "/sds", "--host", "0.0.0.0", "--port", "47546"]
+#CMD ["/bin/sh", "-c", "sleep 5000"]
+

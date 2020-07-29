@@ -97,6 +97,6 @@ RUN echo 'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/b
 RUN addgroup docker --gid 988 && \
   usermod -aG docker dev 
   #ln -sf /var/run/docker.sock /var/run/balena.sock
-
+RUN touch /app/fix_update.txt
 CMD [ "/bin/bash", "/app/progs_wrapper.sh" ]
 #CMD [ "/bin/bash", "-c", "sleep infinity" ]
