@@ -34,7 +34,6 @@ services:
       - .env
     environment:
       - UDEV=1
-      - DBUS_SYSTEM_BUS_ADDRESS:unix:path=/host/run/dbus/system_bus_socket
       #- JUPI_VIM_USER 
       #- JUPI_CREDENTIAL_VERSION
       #- JUPI_AWS_ACCESS_KEY_ID

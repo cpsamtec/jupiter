@@ -70,6 +70,25 @@ JUPI_MYMINIO_SECRET_KEY=minioadmin
 - password is _dev_ (will be configurable in future)
 - port 28282 only
 
+Jupiter also has support for using public client keys. Generate keys following tutorials online.
+
+Example setting in ~/.ssh/config
+
+```bash
+Host jupiter
+Hostname localhost
+User dev
+Port 28282
+StrictHostKeyChecking no
+IdentityFile "generated/pub_priv_keys/location"
+```
+
+To copy public key to Jupiter environment
+
+```bash
+scp -P 28282 /key/location/created_public_key.pub dev@jupiter-ip-address:.ssh/authorized_key
+```
+
 ## Credentials
 
 1. ssh onto device

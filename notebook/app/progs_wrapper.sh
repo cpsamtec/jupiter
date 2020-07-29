@@ -25,10 +25,15 @@ CONFIG_VERSION=2
 if [ ! -e /program/.jupiter/jupiter_config_version ] || [ $(cat /program/.jupiter/jupiter_config_version) != $CONFIG_VERSION ]; then
   mkdir -p /program/.jupiter
   su - dev -c 'git config --global credential.helper "cache --timeout=14400"'
-  su - dev -c 'echo "
-  if [ -e \"/var/run/balena.sock\" ]; then 
-    export DOCKER_HOST=unix:///var/run/balena.sock
-  fi
+  su - dev -c '
+  sed -i "/####BEGIN JUPITER SETTINGS/,/####END JUPITER SETTINGS/d" /home/dev/.bashrc && \
+  echo "
+####BEGIN JUPITER SETTINGS
+if [ -e \"/var/run/balena.sock\" ]; then 
+  export DOCKER_HOST=unix:///var/run/balena.sock
+  export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
+fi
+####END JUPITER SETTINGS
   " >> /home/dev/.bashrc'
   su -w "JUPI_VIM_USER" - dev -c "bash ${DIR}/code-server-installs.sh"
   echo $CONFIG_VERSION > /program/.jupiter/jupiter_config_version
