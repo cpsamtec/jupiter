@@ -91,12 +91,10 @@ COPY /app/ /app/
 ENV SHELL=/bin/bash
 ENV PATH="${PATH}:/home/dev/.local/bin"
 RUN echo "dev:${JUPI_DEFAULT_USER_PASSWORD:-dev}" | chpasswd
-RUN usermod -aG i2c dev
+RUN usermod -aG i2c dev && usermod -aG spi dev  
 RUN addgroup gpio && usermod -aG gpio dev
+RUN addgroup dialout && usermod -aG dialout dev
 RUN echo 'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:${PATH}' > /etc/profile.d/01-path-fix.sh 
 RUN addgroup docker --gid 988 && \
   usermod -aG docker dev 
-  #ln -sf /var/run/docker.sock /var/run/balena.sock
-RUN touch /app/fix_update.txt
 CMD [ "/bin/bash", "/app/progs_wrapper.sh" ]
-#CMD [ "/bin/bash", "-c", "sleep infinity" ]

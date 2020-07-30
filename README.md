@@ -1,45 +1,76 @@
 
 # Jupiter
 
-Containerized development environment
+Containerized multi architecture and hardware supporting development environment. Can be run using docker-compose or deployed to [balena](https://www.balena.io/) devices. Features include
 
-## Get Repo
+- [jupyter](https://jupyter.org/)
+- [jupyter-lab](https://jupyterlab.readthedocs.io/en/stable/) with prebuilt extensions such as plotly, dash, matplotlib and more
+- [code-server](https://github.com/cdr/code-server) VSCode in the browser
+- ssh (supporting client key authentication)
+- [minio-server](https://docs.min.io/docs/minio-quickstart-guide.html) a High Performance Object Storage released
+- [minio-client](https://docs.min.io/docs/minio-client-quickstart-guide.html) (mc) provides a modern alternative to UNIX commands like ls, cat, cp, mirror, diff, find etc with s3 compatability
+- user **dev**
+- persistent directories /code, /lab, /home/dev
+- i2c, gpio, spi, uart/serial configured to work with dev.
+- nginx to expose jupyter, minio, device share, code server over the same port (default 80) with varying routes. Can use ngrok or balena then to make the development environment exposed publicly
+- preinstalled languages include Rust, C/C++, Python 3 (w/ Poetry & Pipenv), Go, Nodejs (w/ nvm)
 
-1. git clone --recursive URL
+## Get Started
 
-2. create a **.env** file in the root directory with the following contents
+1. Get Repo
+    1. git clone --recursive URL
 
-```bash
-JUPI_VIM_USER=0
-JUPI_DEFAULT_USER_PASSWORD=dev
-JUPI_OVERRIDE_USER_PASSWORD=dev
-JUPI_CREDENTIAL_VERSION=1
-JUPI_MYMINIO_ACCESS_KEY=minioadmin
-JUPI_MYMINIO_SECRET_KEY=minioadmin
-```
+    2. create a **.env** file in the root directory with the following contents
 
-## Running
-
-- **Balena**. This project has been prebuilt and uploaded to Balnea projects jupiter-aarch64 (arm64v8) and jupiter-amd64 (amd64)
-
-- **Docker Compose** (build and run on your machine)
-
-  1. get project environment variables from scripts/env.sh
-
-   ```bash
-        source scripts/compose-env.sh
+    ```bash
+    JUPI_VIM_USER=0
+    JUPI_DEFAULT_USER_PASSWORD=dev
+    JUPI_OVERRIDE_USER_PASSWORD=dev
+    JUPI_CREDENTIAL_VERSION=1
+    JUPI_MYMINIO_ACCESS_KEY=minioadmin
+    JUPI_MYMINIO_SECRET_KEY=minioadmin
     ```
 
-  2. build project images using scripts/jupiter.sh
+2. Building
 
-  ```bash
+    Build project images using scripts/jupiter.sh. If you do not specify an architecture your current machines will be used.
+
+    ```bash
     # x86_64
     bash scripts/jupiter.sh build amd64
     # arm64v8
     bash scripts/jupiter.sh build aarch64
-  ```
+    # arm32v7
+    bash scripts/jupiter.sh build aarch32
+    ```
 
-  3. now the images are built run docker-compose up, down, exec ... commands as usual inside the repo directory. Make sure if you open a new terminal to source **scripts/env.sh**
+3. Running (optional w/ docker-compose on current machine)
+
+    1. make sure images are built following steps above (_Building_)
+    2. get project environment variables from scripts/compose-env.sh
+
+    ```bash
+        source scripts/compose-env.sh
+    ```
+
+    3. run docker-compose up, down, exec ... commands as usual inside the repo directory.
+    4. If you open a new terminal source **scripts/compose-env.sh**
+
+4. Deploying to a device with balena
+
+    1. go to balena console and create project jupiter-amd64 or jupiter-aarch64 or jupiter-aarch32 depending on hardware used
+    2. run ```balena login```
+    3. make sure images are built following steps above (_Building_)
+    4. run jupiter.sh script
+
+        ```bash
+        # x86_64
+        bash scripts/jupiter.sh deploy amd64
+        # arm64v8
+        bash scripts/jupiter.sh deploy aarch64
+        # arm32v7
+        bash scripts/jupiter.sh deploy aarch32
+        ```
 
 ## Jupiter Environment
 
@@ -51,7 +82,7 @@ JUPI_MYMINIO_SECRET_KEY=minioadmin
 - SSH
   - port 28282
   - on local network only
-  - password is _dev_ (will be configurable in future)
+  - password is _dev_ (configurable w/ JUPI_OVERRIDE_USER_PASSWORD)
 
 ## Connecting to Environment
 
@@ -63,30 +94,33 @@ JUPI_MYMINIO_SECRET_KEY=minioadmin
     - Jupyter Lab: Python notebooks **/lab**
     - Minio: S3 local bucket server **/minio**
 
-## Local SSH
+## SSH
 
 - ssh for local network only development
 - ssh dev@address -p 28282
-- password is _dev_ (will be configurable in future)
+- password is _dev_ (configurable w/ JUPI_OVERRIDE_USER_PASSWORD)
 - port 28282 only
 
 Jupiter also has support for using public client keys. Generate keys following tutorials online.
 
-Example setting in ~/.ssh/config
+```bash
+ssh-keygen -t rsa
+# Place file in ~/.ssh/id_rsa_jupiter
+# To copy public key to Jupiter environment
+scp -P 28282 ~/.ssh/id_rsa_jupiter.pub dev@jupiter-host-address:~/.ssh/authorized_keys
+# Alternativly to append new client
+#cat ~/.ssh/id_rsa_jupiter.pub | ssh -p 28282 dev@host_addr "cat >> ~/.ssh/authorized_keys"
+```
+
+Example setting in ~/.ssh/config to connect simply with ```ssh jupiter```
 
 ```bash
 Host jupiter
-Hostname localhost
+Hostname jupiter-host-addr
 User dev
 Port 28282
 StrictHostKeyChecking no
-IdentityFile "generated/pub_priv_keys/location"
-```
-
-To copy public key to Jupiter environment
-
-```bash
-scp -P 28282 /key/location/created_public_key.pub dev@jupiter-ip-address:.ssh/authorized_key
+IdentityFile ~/.ssh/id_rsa_jupiter
 ```
 
 ## Credentials
@@ -157,7 +191,7 @@ StrictHostKeyChecking no
 5. Make sure Remote - SSH extension installed
 6. Ctrl/CMD+Shift+P REMOTE - SSH: Connect to host
 7. Enter name-whatever (What you put after Host)
-8. password is _dev_ (will be configurable in future)
+8. password is _dev_ (configurable w/ JUPI_OVERRIDE_USER_PASSWORD)
 
 ## Minio S3
 

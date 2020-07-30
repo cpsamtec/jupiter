@@ -127,6 +127,21 @@ for f in /dev/i2c-*; do
     chmod g+rw "$f"
   fi
 done
+
+for f in /dev/spidev*; do 
+  if [ -e "$f" ]; then 
+    chown :spi "$f"
+    chmod g+rw "$f"
+  fi
+done
+
+for f in dev/ttyUSB* /dev/ttyACM* /dev/ttyAMA* /dev/ttyS*; do 
+  if [ -e "$f" ]; then 
+    chown :dialout "$f"
+    chmod g+rw "$f"
+  fi
+done
+
 if [ -e /dev/gpiomem ]; then 
   chown :gpio "/dev/gpiomem"
   chmod g+rw "/dev/gpiomem"
