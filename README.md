@@ -1,4 +1,3 @@
-
 # Jupiter
 
 Containerized multi architecture and hardware supporting development environment. Can be run using docker-compose or deployed to [balena](https://www.balena.io/) devices. Features include
@@ -8,12 +7,13 @@ Containerized multi architecture and hardware supporting development environment
 - [code-server](https://github.com/cdr/code-server) VSCode in the browser
 - ssh (supporting client key authentication)
 - [minio-server](https://docs.min.io/docs/minio-quickstart-guide.html) a High Performance Object Storage released
-- [minio-client](https://docs.min.io/docs/minio-client-quickstart-guide.html) (mc) provides a modern alternative to UNIX commands like ls, cat, cp, mirror, diff, find etc with s3 compatability
+- [minio-client](https://docs.min.io/docs/minio-client-quickstart-guide.html) (mc) provides commands like ls, cat, cp, mirror, diff, find etc with s3 compatability
 - user **dev**
 - persistent directories /code, /lab, /home/dev
 - i2c, gpio, spi, uart/serial configured to work with dev.
 - nginx to expose jupyter, minio, device share, code server over the same port (default 80) with varying routes. Can use ngrok or balena then to make the development environment exposed publicly
 - preinstalled languages include Rust, C/C++, Python 3 (w/ Poetry & Pipenv), Go, Nodejs (w/ nvm)
+- device share service allow remotely discovering, wifi, and network control and monitoring when run on balena device
 
 ## Get Started
 
@@ -33,15 +33,13 @@ Containerized multi architecture and hardware supporting development environment
 
 2. Building
 
-    Build project images using scripts/jupiter.sh. If you do not specify an architecture your current machines will be used.
+    Build project images using scripts/jupiter.sh. If you do not specify an architecture your current machines will be used. Currently x86_64 and arm64v8 are supported.
 
     ```bash
     # x86_64
     bash scripts/jupiter.sh build amd64
     # arm64v8
     bash scripts/jupiter.sh build aarch64
-    # arm32v7
-    bash scripts/jupiter.sh build aarch32
     ```
 
 3. Running (optional w/ docker-compose on current machine)
@@ -49,16 +47,16 @@ Containerized multi architecture and hardware supporting development environment
     1. make sure images are built following steps above (_Building_)
     2. get project environment variables from scripts/compose-env.sh
 
-    ```bash
-        source scripts/compose-env.sh
-    ```
+        ```bash
+            source scripts/compose-env.sh
+        ```
 
     3. run docker-compose up, down, exec ... commands as usual inside the repo directory.
     4. If you open a new terminal source **scripts/compose-env.sh**
 
 4. Deploying to a device with balena
 
-    1. go to balena console and create project jupiter-amd64 or jupiter-aarch64 or jupiter-aarch32 depending on hardware used
+    1. go to balena console and create project jupiter-amd64 or jupiter-aarch64 depending on hardware used
     2. run ```balena login```
     3. make sure images are built following steps above (_Building_)
     4. run jupiter.sh script
@@ -68,31 +66,14 @@ Containerized multi architecture and hardware supporting development environment
         bash scripts/jupiter.sh deploy amd64
         # arm64v8
         bash scripts/jupiter.sh deploy aarch64
-        # arm32v7
-        bash scripts/jupiter.sh deploy aarch32
         ```
 
-## Jupiter Environment
+## Environment address
 
-- User is **dev**
-- Directories
-  - /code persistent directory for coding projects
-  - /lab persistent directory for jupyter lab notebook projects
-  - /home/dev perisistent home directory for virtual envs and user configuration files
-- SSH
-  - port 28282
-  - on local network only
-  - password is _dev_ (configurable w/ JUPI_OVERRIDE_USER_PASSWORD)
-
-## Connecting to Environment
-
-- When running docker-compose on host address will be _localhost_ or _127.0.0.1_
+- When running docker-compose on host the address will be _localhost_ or _127.0.0.1_
 - A balena device running the environment can use the first 7 digits of balena id followed by _.local_. example b123456.local. Make sure Bonjour/Zeroconf is installed on the machine you are conecting from
 - A balena device IP can be found by going to the balena portal
-- Many services of the environment can be accessed remotely at **https://[balena-device-id].balena-devices.com/[service]** when run from a balena device and public access is enabled. Services include
-    - Code Server: In browser VSCode **/code**
-    - Jupyter Lab: Python notebooks **/lab**
-    - Minio: S3 local bucket server **/minio**
+- On a balena device services of the environment can be accessed remotely at **https://[balena-device-id].balena-devices.com/[service]** when run from a balena device and public access is enabled. See **Jupiter Environment** below
 
 ## SSH
 
@@ -125,8 +106,34 @@ IdentityFile ~/.ssh/id_rsa_jupiter
 
 ## Credentials
 
-1. ssh onto device
-2. bash /app/credentials.sh to get info on running services. tokens etc.
+Jupyter and Code server credentials can be found by 
+
+- Browser
+    1. open your browser
+    2. go to http://[environment address]/myminio (minio local s3 server service)
+    3. select system bucket
+    4. download and open credentials.txt
+
+- SSH
+    1. ssh onto device using above instructions from _ssh_
+    2. run bash /app/credentials.sh
+
+## Jupiter Environment
+
+- User is **dev**
+- Directories
+  - /code persistent directory for coding projects
+  - /lab persistent directory for jupyter lab notebook projects
+  - /home/dev perisistent home directory for virtual envs and user configuration files
+  - /app non persistent directory where jupiter scripts reside
+- SSH
+  - port 28282
+  - password is _dev_ (configurable w/ JUPI_OVERRIDE_USER_PASSWORD)
+
+Services can be accessed at http://[environment address]/[service]
+    - **code** Code Server: In browser VSCode
+    - **lab** Jupyter Lab: Python notebooks
+    - **minio** Minio: S3 local bucket server
 
 ## WIFI/Network - Balena
 
@@ -152,8 +159,8 @@ Extensions have been installed and only need to be enabled. Do not install any f
 From a browser goto
 
 - On same local network
-  - http://ip/lab
-  - http://ip:8888
+  - http://[environment address]/lab
+  - http://[environment address]:8888
     (ip can be 7 digit balena device uuid.local or actual ip)
 - Remote/Local running on a balena device only with internet access
   - https://[balena-device-id].balena-devices.com/lab
@@ -163,8 +170,8 @@ From a browser goto
 From a browser goto
 
 - On same local network
-  - http://ip/code
-  - http://ip:8080
+  - http://[environment address]/code
+  - http://[environment address]:8080
     (ip can be 7 digit balena device uuid.local or actual ip)
 - Remote/Local running on a balena device only with internet access
   - https://[balena-device-id].balena-devices.com/code
@@ -173,25 +180,13 @@ some extensions have been installed by default.
 
 ### VSCode
 
-Make sure to create new coding projects in /code directory of the Jupiter environment.
+To directly code projects in the Juipter environment from your host machines VSCode app you can do so using the ssh remote extension. Make sure to create new coding projects in /code directory of the Jupiter environment.
 
-1. Add following to ~/.ssh/config on your machine
-
-```bash
-Host name-whatever  
-HostName xxxxxxx.local
-User dev
-Port 28282
-StrictHostKeyChecking no
-```
-
-2. Change Host to whatever you want to call environment running on device.
-3. Change Hostname to 7 digit balena device uuid ending with .local or ip address of device.
-4. Open VSCode on your computer
-5. Make sure Remote - SSH extension installed
-6. Ctrl/CMD+Shift+P REMOTE - SSH: Connect to host
-7. Enter name-whatever (What you put after Host)
-8. password is _dev_ (configurable w/ JUPI_OVERRIDE_USER_PASSWORD)
+1. Configure using instructions from _SSH_. It is preferable to use the public client key configuration, however you can skip the IdentityFile and just use a password.
+2. Open VSCode on your computer
+3. Make sure Remote - SSH extension installed
+4. Ctrl/CMD+Shift+P REMOTE - SSH: Connect to host
+5. Enter name-whatever (What you put after Host)
 
 ## Minio S3
 

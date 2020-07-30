@@ -71,6 +71,8 @@ if [ ! -d /home/dev/.ssh ]; then
   chmod 700 /home/dev/.ssh
   touch /home/dev/.ssh/authorized_keys
   chmod 600 /home/dev/.ssh/authorized_keys
+  touch /home/dev/.ssh/config
+  chmod 600 /home/dev/.ssh/config
   chown -R dev:dev /home/dev/.ssh
 fi
 
@@ -87,6 +89,7 @@ if [ ! -f ${SSH_KEY_RSA} ]; then
   chmod 600 ${SSH_KEY_RSA}
 fi
 
+# Check if jupyter notebook config exists. If not create it with delete to trash false
 if [ ! -f "/home/dev/.jupyter/jupyter_notebook_config.py" ]; then 
   su -w "PATH" - dev -c "jupyter notebook --generate-config && 
     sed -i 's/#c.FileContentsManager.delete_to_trash.*/c.FileContentsManager.delete_to_trash = False/' '/home/dev/.jupyter/jupyter_notebook_config.py'"

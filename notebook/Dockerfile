@@ -86,14 +86,16 @@ ENV JUPYTERLAB_DIR=${JUPYTERLAB_DIR_DEFAULT}
 COPY user-jupyter-installs.sh /tmp
 RUN su -w "JUPYTERLAB_DIR_DEFAULT,JUPYTERLAB_DIR_VIM" - dev -c "bash /tmp/user-jupyter-installs.sh" 
 
+RUN npm install n -g && n stable
 COPY --from=arch_loader /out/minio/bin/mc /usr/bin/mc
 COPY /app/ /app/
 ENV SHELL=/bin/bash
 ENV PATH="${PATH}:/home/dev/.local/bin"
 RUN echo "dev:${JUPI_DEFAULT_USER_PASSWORD:-dev}" | chpasswd
-RUN usermod -aG i2c dev && usermod -aG spi dev  
+RUN usermod -aG i2c dev 
+RUN usermod -aG dialout dev
 RUN addgroup gpio && usermod -aG gpio dev
-RUN addgroup dialout && usermod -aG dialout dev
+RUN addgroup spi && usermod -aG spi dev
 RUN echo 'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:${PATH}' > /etc/profile.d/01-path-fix.sh 
 RUN addgroup docker --gid 988 && \
   usermod -aG docker dev 

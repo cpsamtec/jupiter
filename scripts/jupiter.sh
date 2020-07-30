@@ -29,16 +29,9 @@ set_deploy_arch() {
             COMPOSE_BUILD_ARGS=${FIXED_COMPOSE_BUILD_ARGS//DOCKER_ARCH/arm64v8}
             BALENA_BUILD_ARGS=${FIXED_BALENA_BUILD_ARGS//DOCKER_ARCH/arm64v8}
         ;;
-        "aarch32")
-            JUPI_DEPLOY_ARCH="${1}"
-            JUPI_PROJECT_NAME="${GLOBAL_JUPI_PROJECT_NAME:-jupiter-aarch32}"
-            MYMINIO_DOCKERFILE=Dockerfile.arm.release
-            COMPOSE_BUILD_ARGS=${FIXED_COMPOSE_BUILD_ARGS//DOCKER_ARCH/arm32v7}
-            BALENA_BUILD_ARGS=${FIXED_BALENA_BUILD_ARGS//DOCKER_ARCH/arm32v7}
-            ;;
         *)
             echo "invalid architecture ${JUPI_DEPLOY_ARCH}"
-            echo "valid include - amd64 | aarch64 | aarch32" 
+            echo "valid include - amd64 | aarch64" 
             exit 1
             ;;
     esac
@@ -49,9 +42,6 @@ if [ -z $JUPI_DEPLOY_ARCH ]; then
     case $SYSTEM_ARCH in
         "aarch64")
             set_deploy_arch "aarch64"
-            ;;
-        "aarch32")
-            set_deploy_arch "aarch32"
             ;;
         "x86_64")
             set_deploy_arch "amd64"
@@ -68,9 +58,6 @@ fi
 create_local_docker_aarch64() {
     cat docker-compose.yml | sed 's/#dockerfile/dockerfile/' > docker-compose-aarch64.yml
 }
-create_local_docker_aarch32() {
-    cat docker-compose.yml | sed 's/#dockerfile.*/dockerfile: Dockerfile.arm.release/' > docker-compose-aarch32.yml
-}
 
 ProgName=$(basename $0)
   
@@ -80,7 +67,7 @@ sub_help(){
     echo "    build  - build the images"
     echo "    deploy - deploy images as application to balena"
     echo ""
-    echo 'env JUPI_DEPLOY_ARCH be "amd64" | "aarch64" | "aarch32"'
+    echo 'env JUPI_DEPLOY_ARCH be "amd64" | "aarch64"'
     echo ""
     echo "For help with each subcommand run:"
     echo "$ProgName <subcommand> -h|--help"
@@ -89,8 +76,8 @@ sub_help(){
   
 sub_build_help(){
     echo '
-    build can pass "amd64" | "aarch64" | "aarch32"
-        default: aarch64
+    build can pass "amd64" | "aarch64"
+        default: system
         alternativly can be set in env JUPI_DEPLOY_ARCH
     '
 }
@@ -118,8 +105,8 @@ sub_build(){
   
 sub_deploy_help(){
     echo '
-    deploy can pass "amd64" | "aarch64" | "aarch32"
-        default: aarch64
+    deploy can pass "amd64" | "aarch64" 
+        default: system
         alternativly can be set in env JUPI_DEPLOY_ARCH
     '
 }
