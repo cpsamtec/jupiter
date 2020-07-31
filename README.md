@@ -1,6 +1,6 @@
 # Jupiter
 
-Containerized multi architecture and hardware supporting development environment. Can be run using docker-compose or deployed to [balena](https://www.balena.io/) devices. Features include
+A containerized development environment. Can be run on devices supporting amd64/x86_64 or arm64v8 (Raspberry PI 4) using docker-compose or deployed to [balena](https://www.balena.io/) devices. Features include
 
 - [jupyter](https://jupyter.org/)
 - [jupyter-lab](https://jupyterlab.readthedocs.io/en/stable/) with prebuilt extensions such as plotly, dash, matplotlib and more
@@ -11,27 +11,32 @@ Containerized multi architecture and hardware supporting development environment
 - user **dev**
 - persistent directories /code, /lab, /home/dev
 - i2c, gpio, spi, uart/serial configured to work with dev.
-- nginx to expose jupyter, minio, device share, code server over the same port (default 80) with varying routes. Can use ngrok or balena then to make the development environment exposed publicly
+- nginx to expose jupyter, minio, device share, code server over the same port (default 80) with varying routes. Can use ngrok or balena then to make the development environment available publicly.
 - preinstalled languages include Rust, C/C++, Python 3 (w/ Poetry & Pipenv), Go, Nodejs (w/ nvm)
-- device share service allow remotely discovering, wifi, and network control and monitoring when run on balena device
+- device share service allowing remote discovering, wifi, and network control and monitoring when run on a balena device
 
 ## Get Started
 
-1. Get Repo
-    1. git clone --recursive URL
+1. Requirements
+    - Docker
+    - Docker Compose
+    - Bash
+    - Balena (optional)
 
+2. Get Repo
+    1. git clone --recursive URL
     2. create a **.env** file in the root directory with the following contents
 
-    ```bash
-    JUPI_VIM_USER=0
-    JUPI_DEFAULT_USER_PASSWORD=dev
-    JUPI_OVERRIDE_USER_PASSWORD=dev
-    JUPI_CREDENTIAL_VERSION=1
-    JUPI_MYMINIO_ACCESS_KEY=minioadmin
-    JUPI_MYMINIO_SECRET_KEY=minioadmin
-    ```
+        ```bash
+        JUPI_VIM_USER=0
+        JUPI_DEFAULT_USER_PASSWORD=dev
+        JUPI_OVERRIDE_USER_PASSWORD=dev
+        JUPI_CREDENTIAL_VERSION=1
+        JUPI_MYMINIO_ACCESS_KEY=minioadmin
+        JUPI_MYMINIO_SECRET_KEY=minioadmin
+        ```
 
-2. Building
+3. Building
 
     Build project images using scripts/jupiter.sh. If you do not specify an architecture your current machines will be used. Currently x86_64 and arm64v8 are supported.
 
@@ -42,7 +47,7 @@ Containerized multi architecture and hardware supporting development environment
     bash scripts/jupiter.sh build aarch64
     ```
 
-3. Running (optional w/ docker-compose on current machine)
+4. Running (optional w/ docker-compose on current machine)
 
     1. make sure images are built following steps above (_Building_)
     2. get project environment variables from scripts/compose-env.sh
@@ -54,7 +59,7 @@ Containerized multi architecture and hardware supporting development environment
     3. run docker-compose up, down, exec ... commands as usual inside the repo directory.
     4. If you open a new terminal source **scripts/compose-env.sh**
 
-4. Deploying to a device with balena
+5. Deploying to a device with balena
 
     1. go to balena console and create project jupiter-amd64 or jupiter-aarch64 depending on hardware used
     2. run ```balena login```
@@ -106,7 +111,7 @@ IdentityFile ~/.ssh/id_rsa_jupiter
 
 ## Credentials
 
-Jupyter and Code server credentials can be found by 
+Jupyter and Code Server credentials can be found by
 
 - Browser
     1. open your browser
@@ -134,6 +139,7 @@ Services can be accessed at http://[environment address]/[service]
     - **code** Code Server: In browser VSCode
     - **lab** Jupyter Lab: Python notebooks
     - **minio** Minio: S3 local bucket server
+    - **sds** Device Share: Support when running on balena device to discover and configure network/wifi, reboot, get info
 
 ## WIFI/Network - Balena
 

@@ -11,11 +11,8 @@ services:
       - APP_LOG_PATH=/tmp/logs
       - ETH_DISABLE=1
       - SDC_WIFI_TYPE=DISABLED
-      #- APP_IMG_PATH=/img.png
     volumes:
       - 'logs-volume:/tmp/logs'
-      #- '/var/run/docker.sock:/var/run/docker.sock'
-      #- '/var/run/balena.sock:/var/run/docker.sock'
     labels:
       io.balena.features.supervisor-api: '1'
       io.balena.features.balena-api: '1'
