@@ -39,6 +39,8 @@ services:
       #- JUPI_OVERRIDE_USER_PASSWORD
       #- JUPI_MYMINIO_ACCESS_KEY
       #- JUPI_MYMINIO_SECRET_KEY
+    depends_on: 
+      - myminio
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
       - "/dev/mem:/dev/mem"

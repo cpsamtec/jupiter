@@ -48,7 +48,7 @@ if [ ! -e /program/.jupiter/jupiter_credential_version ] || [ $(cat /program/.ju
   mkdir -p /program/.jupiter
   su -w "JUPI_MYMINIO_ACCESS_KEY,JUPI_MYMINIO_SECRET_KEY,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY" - dev -c "bash ${DIR}/minio_config.sh"
   su - dev -c "mc mb -p myminio/jupiter" 
-  echo "$JUPI_CREDENTIAL_VERSION" > /program/.jupiter/jupiter_credential_version
+  echo "${SYSTEM_CREDENTIAL_VERION}" > /program/.jupiter/jupiter_credential_version
 fi
 
 if [ ! -z ${JUPI_OVERRIDE_USER_PASSWORD} ] && [ ${JUPI_OVERRIDE_USER_PASSWORD} != ${JUPI_DEFAULT_USER_PASSWORD} ]; then 
