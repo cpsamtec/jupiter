@@ -21,34 +21,40 @@ if [ $USER != "dev" ]; then
   chown -R dev:dev /home/dev 
 fi
 
-CONFIG_VERSION=2
-if [ ! -e /program/.jupiter/jupiter_config_version ] || [ $(cat /program/.jupiter/jupiter_config_version) != $CONFIG_VERSION ]; then
+CONFIG_VERSION=3
+if [ ! -e /program/.jupiter/jupiter_config_version ] || [ "$(cat /program/.jupiter/jupiter_config_version)" != $CONFIG_VERSION ]; then
   mkdir -p /program/.jupiter
   su - dev -c 'git config --global credential.helper "cache --timeout=14400"'
   su - dev -c '
   sed -i "/####BEGIN JUPITER SETTINGS/,/####END JUPITER SETTINGS/d" /home/dev/.bashrc && \
-  echo "
+  cat << EOF >> /home/dev/.bashrc
 ####BEGIN JUPITER SETTINGS
-if [ -e \"/var/run/balena.sock\" ]; then 
+if [ -e "/var/run/balena.sock" ]; then 
   export DOCKER_HOST=unix:///var/run/balena.sock
   export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 fi
 ####END JUPITER SETTINGS
-  " >> /home/dev/.bashrc'
+EOF
+'
+ 
   su -w "JUPI_VIM_USER" - dev -c "bash ${DIR}/code-server-installs.sh"
   echo $CONFIG_VERSION > /program/.jupiter/jupiter_config_version
   sync
 fi
 
-SYSTEM_CREDENTIAL_VERION=1
-USER_CREDENTIAL_VERSION=${JUPI_CREDENTIAL_VERSION:-1}
-SYSTEM_CREDENTIAL_VERION="${SYSTEM_CREDENTIAL_VERION}-${USER_CREDENTIAL_VERSION}"
+SYSTEM_CREDENTIAL_VERSION=1
+USER_CREDENTIAL_VERSION=${JUPI_CREDENTIAL_VERSION:=0}
+SYSTEM_CREDENTIAL_VERSION="${SYSTEM_CREDENTIAL_VERSION}-${USER_CREDENTIAL_VERSION}"
 
-if [ ! -e /program/.jupiter/jupiter_credential_version ] || [ $(cat /program/.jupiter/jupiter_credential_version) != $SYSTEM_CREDENTIAL_VERION ]; then
+if [ -f /program/.jupiter/jupiter_credential_version ]; then
+  CURR_CREDENTIAL_VERSION=$(cat /program/.jupiter/jupiter_credential_version)
+fi
+CURR_CREDENTIAL_VERSION=${CURR_CREDENTIAL_VERSION:="x-x"}
+if [ "$CURR_CREDENTIAL_VERSION" != "$SYSTEM_CREDENTIAL_VERSION" ]; then
   mkdir -p /program/.jupiter
-  su -w "JUPI_MYMINIO_ACCESS_KEY,JUPI_MYMINIO_SECRET_KEY,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY" - dev -c "bash ${DIR}/minio_config.sh"
-  su - dev -c "mc mb -p myminio/jupiter" 
-  echo "${SYSTEM_CREDENTIAL_VERION}" > /program/.jupiter/jupiter_credential_version
+  su -w "JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY" - dev -c "bash ${DIR}/s3_config.sh"
+  echo "${SYSTEM_CREDENTIAL_VERSION}" > /program/.jupiter/jupiter_credential_version
+  sync
 fi
 
 if [ ! -z ${JUPI_OVERRIDE_USER_PASSWORD} ] && [ ${JUPI_OVERRIDE_USER_PASSWORD} != ${JUPI_DEFAULT_USER_PASSWORD} ]; then 
@@ -157,7 +163,6 @@ fi
 
 sleep 20
 su - dev -c "bash ${DIR}/credentials.sh > /tmp/credentials.txt"
-su - dev -c "mc cp /tmp/credentials.txt myminio/jupiter" 
 
 while sleep 60; do
   ps aux |grep code-server | grep -q -v grep

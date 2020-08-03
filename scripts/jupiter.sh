@@ -4,7 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR/.. 
 
 #Initialize globals
-SERVICES="sds nginx notebook myminio"
+SERVICES="sds nginx notebook"
 SYSTEM_ARCH=$(uname -m)
 BUILD_ARGS="BUILD_ARG BASE_IMAGE_ARCH=DOCKER_ARCH BUILD_ARG NOTEBOOK_BASE_IMAGE=DOCKER_ARCH/ubuntu:groovy BUILD_ARG SDS_BASE_IMAGE=DOCKER_ARCH/python:3.8-alpine"
 
@@ -18,14 +18,12 @@ set_deploy_arch() {
         "amd64")
             JUPI_DEPLOY_ARCH="${1}"
             JUPI_PROJECT_NAME="${GLOBAL_JUPI_PROJECT_NAME:-jupiter-amd64}"
-            MYMINIO_DOCKERFILE=Dockerfile
             COMPOSE_BUILD_ARGS=${FIXED_COMPOSE_BUILD_ARGS//DOCKER_ARCH/amd64}
             BALENA_BUILD_ARGS=${FIXED_BALENA_BUILD_ARGS//DOCKER_ARCH/amd64}
         ;;
         "aarch64")
             JUPI_DEPLOY_ARCH="${1}"
             JUPI_PROJECT_NAME="${GLOBAL_JUPI_PROJECT_NAME:-jupiter-aarch64}"
-            MYMINIO_DOCKERFILE=Dockerfile.arm64.release
             COMPOSE_BUILD_ARGS=${FIXED_COMPOSE_BUILD_ARGS//DOCKER_ARCH/arm64v8}
             BALENA_BUILD_ARGS=${FIXED_BALENA_BUILD_ARGS//DOCKER_ARCH/arm64v8}
         ;;
@@ -97,9 +95,9 @@ sub_build(){
             ;;
     esac
     if command -v docker-compose &> /dev/null; then
-        MYMINIO_DOCKERFILE=$MYMINIO_DOCKERFILE docker-compose --project-name ${JUPI_PROJECT_NAME} build ${COMPOSE_BUILD_ARGS} ${SERVICES} 
+        docker-compose --project-name ${JUPI_PROJECT_NAME} build ${COMPOSE_BUILD_ARGS} ${SERVICES} 
     else
-        MYMINIO_DOCKERFILE=$MYMINIO_DOCKERFILE balena build --projectName ${JUPI_PROJECT_NAME} --application ${JUPI_PROJECT_NAME} ${BALENA_BUILD_ARGS} 
+        balena build --projectName ${JUPI_PROJECT_NAME} --application ${JUPI_PROJECT_NAME} ${BALENA_BUILD_ARGS} 
     fi
 }
   
@@ -125,7 +123,7 @@ sub_deploy(){
             echo "deploying ${JUPI_DEPLOY_ARCH}"
             ;;
     esac
-    MYMINIO_DOCKERFILE=$MYMINIO_DOCKERFILE balena deploy --projectName ${JUPI_PROJECT_NAME} ${BALENA_BUILD_ARGS} ${JUPI_PROJECT_NAME} 
+    balena deploy --projectName ${JUPI_PROJECT_NAME} ${BALENA_BUILD_ARGS} ${JUPI_PROJECT_NAME} 
 }
   
 subcommand=$1

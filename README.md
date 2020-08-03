@@ -6,12 +6,11 @@ A containerized development environment. Can be run on devices supporting amd64/
 - [jupyter-lab](https://jupyterlab.readthedocs.io/en/stable/) with prebuilt extensions such as plotly, dash, matplotlib and more
 - [code-server](https://github.com/cdr/code-server) VSCode in the browser
 - ssh (supporting client key authentication)
-- [minio-server](https://docs.min.io/docs/minio-quickstart-guide.html) a High Performance Object Storage released
 - [minio-client](https://docs.min.io/docs/minio-client-quickstart-guide.html) (mc) provides commands like ls, cat, cp, mirror, diff, find etc with s3 compatability
 - user **dev**
 - persistent directories /code, /lab, /home/dev
 - i2c, gpio, spi, uart/serial configured to work with dev.
-- nginx to expose jupyter, minio, device share, code server over the same port (default 80) with varying routes. Can use ngrok or balena then to make the development environment available publicly.
+- nginx to expose jupyter, device share, code server over the same port (default 80) with varying routes. Can use ngrok or balena then to make the development environment available publicly.
 - preinstalled languages include Rust, C/C++, Python 3 (w/ Poetry & Pipenv), Go, Nodejs (w/ nvm)
 - device share service allowing remote discovering, wifi, and network control and monitoring when run on a balena device
 
@@ -33,9 +32,6 @@ A containerized development environment. Can be run on devices supporting amd64/
         JUPI_DEFAULT_USER_PASSWORD=dev
         JUPI_OVERRIDE_USER_PASSWORD=dev
         JUPI_CREDENTIAL_VERSION=1
-        #required in notebook and myminio service
-        MINIO_ACCESS_KEY=minioadmin
-        MINIO_SECRET_KEY=minioadmin
         ```
 
 3. Building
@@ -66,9 +62,6 @@ A containerized development environment. Can be run on devices supporting amd64/
     1. go to balena console <https://dashboard.balena-cloud.com/> and create project jupiter-amd64 or jupiter-aarch64 depending on hardware used
     2. expose environment variables most have default if not set in the console
 
-        - notebook and mymino service - have defaults
-            - MINIO_ACCESS_KEY=minioadmin
-            - MINIO_SECRET_KEY=minioadmin
         - notebook service - have defaults
             - JUPI_VIM_USER=0
             - JUPI_DEFAULT_USER_PASSWORD=dev
@@ -129,15 +122,9 @@ IdentityFile ~/.ssh/id_rsa_jupiter
 
 Jupyter and Code Server credentials can be found by
 
-- Browser
-    1. open your browser
-    2. go to http://[environment address]/myminio (minio local s3 server service)
-    3. select system bucket
-    4. download and open credentials.txt
-
 - SSH
-    1. ssh onto device using above instructions from _ssh_
-    2. run bash /app/credentials.sh
+    1. ssh onto device using above instructions from **SSH**
+    2. cat /tmp/credentials.txt
 
 ## Jupiter Environment
 
@@ -154,7 +141,6 @@ Jupyter and Code Server credentials can be found by
 Services can be accessed at http://[environment address]/[service]
     - **code** Code Server: In browser VSCode
     - **lab** Jupyter Lab: Python notebooks
-    - **myminio** Minio: S3 local bucket server
     - **sds** Device Share: Support when running on balena device to discover and configure network/wifi, reboot, get info
 
 ## WIFI/Network - Jupiter on a Balena device
@@ -212,36 +198,22 @@ To directly code projects in the Juipter environment from your host machines VSC
 4. Ctrl/CMD+Shift+P REMOTE - SSH: Connect to host
 5. Enter name-whatever (What you put after Host)
 
-## Minio S3
-
-A local s3 server is also running on the device with minio command line client. The server is called **myminio**. You can use the command line client **mc** to add/remove buckets and files just as though it were a directory with the only exception you cannot create directories. This is an object store. Examples
-
-- list buckets: ```mc ls myminio```
-- create bucket tests: ```mc mb myminio/tests```
-- list file objects in bucket tests: ```mc ls myminio/tests```
-- copy file to tests: ```mc cp mytest.txt myminio/tests```
-
-Further client documentation can be found here
-[Minio Client](https://docs.min.io/docs/minio-client-quickstart-guide.html)
-
-A web client can be found using a web browser going to
-
-- On same local network
-  - http://ip/minio
-  - http://ip:9000
-    (ip can be 7 digit balena device uuid.local or actual ip)
-- Remote/Local running on a balena device only with internet access
-  - https://[balena-device-id].balena-devices.com/myminio
-
-Credentials can be found in environment keys
-
-- MINIO_ACCESS_KEY: default minioadmin
-- MINIO_SECRET_KEY: default minioadmin
+## Minio S3 Client
 
 If the following credentials are set the minio client can be used on s3 (example mc ls s3/)
 
 - JUPI_AWS_ACCESS_KEY_ID
 - JUPI_AWS_SECRET_ACCESS_KEY
+
+A device with minio command line client. You can use the command line client **mc** to add/remove buckets and files just as though it were a directory with the only exception you cannot create directories. This is an object store. Examples
+
+- list buckets: ```mc ls s3```
+- create bucket tests: ```mc mb s3/tests```
+- list file objects in bucket tests: ```mc ls s3/tests```
+- copy file to tests: ```mc cp mytest.txt s3/tests```
+
+Further client documentation can be found here
+[Minio Client](https://docs.min.io/docs/minio-client-quickstart-guide.html)
 
 ## Software Tools
 
@@ -272,18 +244,15 @@ For service notebook
 
 - Enable/Disable VIM mode and extensions in Jupyter Lab and Code Server. 0 - Disabled (default), 1 - Enabled
     - JUPI_VIM_USER
-- Enable minio client to access AWS S3. (ex. mc ls s3/)
+- Enable minio client to access AWS S3. ~/.aws/credentials also configured. (ex. mc ls s3/)
     - JUPI_AWS_ACCESS_KEY_ID
     - JUPI_AWS_SECRET_ACCESS_KEY
-- If credentials are changed (s3 or myminio) increase this value so the new ones are configured to be used in the environment. Default 1
+- If credentials are changed (s3) increase this value so the new ones are configured to be used in the environment. Default 1
     - JUPI_CREDENTIAL_VERSION
 - Change the build time user password for dev
     - JUPI_DEFAULT_USER_PASSWORD
 - Change the runtime user password for dev. Will be different than what is in generated image
     - JUPI_OVERRIDE_USER_PASSWORD
-- Change the myminio default passwords. Make sure greater than 8 characters
-    - MINIO_ACCESS_KEY
-    - MINIO_SECRET_KEY
 
 ## Device Share - Balena
 
