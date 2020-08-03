@@ -95,6 +95,11 @@ if [ ! -f "/home/dev/.jupyter/jupyter_notebook_config.py" ]; then
     sed -i 's/#c.FileContentsManager.delete_to_trash.*/c.FileContentsManager.delete_to_trash = False/' '/home/dev/.jupyter/jupyter_notebook_config.py'"
 fi
 
+# Make sure dev user can run docker commands
+if [ -e /var/run/docker.sock ]; then 
+  chgrp docker /var/run/docker.sock
+fi
+
 # Start the first process
 cd /code
 su -w "JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,CARGO_HOME,RUSTUP_HOME,BALENA_DEVICE_UUID" - dev -c "code-server --bind-addr 0.0.0.0:8080 /code &"
@@ -138,7 +143,7 @@ for f in /dev/spidev*; do
   fi
 done
 
-for f in dev/ttyUSB* /dev/ttyACM* /dev/ttyAMA* /dev/ttyS*; do 
+for f in dev/ttyUSB* /dev/ttyACM* /dev/ttyAMA*; do 
   if [ -e "$f" ]; then 
     chown :dialout "$f"
     chmod g+rw "$f"

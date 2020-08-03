@@ -1,8 +1,8 @@
 # Jupiter
 
-A containerized development environment. Can be run on devices supporting amd64/x86_64 or arm64v8 (Raspberry PI 4) using docker-compose or deployed to [balena](https://www.balena.io/) devices. Features include
+A containerized development environment. Can be run on devices supporting amd64/x86_64 or aarch64/arm64v8 using docker-compose or deployed to [balena](https://www.balena.io/) devices. Features include
 
-- [jupyter](https://jupyter.org/)
+- [jupyter](https://jupyter.org/) notebooks
 - [jupyter-lab](https://jupyterlab.readthedocs.io/en/stable/) with prebuilt extensions such as plotly, dash, matplotlib and more
 - [code-server](https://github.com/cdr/code-server) VSCode in the browser
 - ssh (supporting client key authentication)
@@ -28,12 +28,14 @@ A containerized development environment. Can be run on devices supporting amd64/
     2. create a **.env** file in the root directory with the following contents
 
         ```bash
+        #used in notebook service
         JUPI_VIM_USER=0
         JUPI_DEFAULT_USER_PASSWORD=dev
         JUPI_OVERRIDE_USER_PASSWORD=dev
         JUPI_CREDENTIAL_VERSION=1
-        JUPI_MYMINIO_ACCESS_KEY=minioadmin
-        JUPI_MYMINIO_SECRET_KEY=minioadmin
+        #required in notebook and myminio service
+        MINIO_ACCESS_KEY=minioadmin
+        MINIO_SECRET_KEY=minioadmin
         ```
 
 3. Building
@@ -61,10 +63,24 @@ A containerized development environment. Can be run on devices supporting amd64/
 
 5. Deploying to a device with balena
 
-    1. go to balena console and create project jupiter-amd64 or jupiter-aarch64 depending on hardware used
-    2. run ```balena login```
-    3. make sure images are built following steps above (_Building_)
-    4. run jupiter.sh script
+    1. go to balena console <https://dashboard.balena-cloud.com/> and create project jupiter-amd64 or jupiter-aarch64 depending on hardware used
+    2. expose environment variables most have default if not set in the console
+
+        - notebook and mymino service - have defaults
+            - MINIO_ACCESS_KEY=minioadmin
+            - MINIO_SECRET_KEY=minioadmin
+        - notebook service - have defaults
+            - JUPI_VIM_USER=0
+            - JUPI_DEFAULT_USER_PASSWORD=dev
+            - JUPI_OVERRIDE_USER_PASSWORD=dev
+            - JUPI_CREDENTIAL_VERSION=1 *increment if any access or secret key environment variables change*
+        - notebook service - no defaults
+            - JUPI_AWS_ACCESS_KEY_ID
+            - JUPI_AWS_SECRET_ACCESS_KEY
+
+    3. run ```balena login```
+    4. make sure images are built following steps above (_Building_)
+    5. run jupiter.sh script
 
         ```bash
         # x86_64
@@ -138,12 +154,14 @@ Jupyter and Code Server credentials can be found by
 Services can be accessed at http://[environment address]/[service]
     - **code** Code Server: In browser VSCode
     - **lab** Jupyter Lab: Python notebooks
-    - **minio** Minio: S3 local bucket server
+    - **myminio** Minio: S3 local bucket server
     - **sds** Device Share: Support when running on balena device to discover and configure network/wifi, reboot, get info
 
-## WIFI/Network - Balena
+## WIFI/Network - Jupiter on a Balena device
 
-By default a hotspot is created on wifi enabled devices. Look for WIFI network with name SDC-XXXXXXX where XXXXXXX is the 7 digit balena id. The password can be found under environment variables on the balena app dashboard. Look for SDC_WIFI_PASS. Other useful environment variables are as followed.
+By default a hotspot is created on wifi enabled devices. Look for WIFI network with name SDC-XXXXXXX where XXXXXXX is the 7 digit balena id. The password can be set/found under environment variables on the balena app dashboard. Look for SDC_WIFI_PASS. This is provided by the **Device Share** service discussed futher at end of the README.
+
+Other useful environment variables are as followed. They can be set in the jupiter-xxxx application section of the balena console <https://dashboard.balena-cloud.com/> for the service **sds**.
 
 | Name              | Description                   | Default                                     |
 | ----------------- | ----------------------------- | ------------------------------------------- |
@@ -217,8 +235,8 @@ A web client can be found using a web browser going to
 
 Credentials can be found in environment keys
 
-- JUPI_MYMINIO_ACCESS_KEY: default minioadmin
-- JUPI_MYMINIO_SECRET_KEY: default minioadmin
+- MINIO_ACCESS_KEY: default minioadmin
+- MINIO_SECRET_KEY: default minioadmin
 
 If the following credentials are set the minio client can be used on s3 (example mc ls s3/)
 
@@ -264,5 +282,9 @@ For service notebook
 - Change the runtime user password for dev. Will be different than what is in generated image
     - JUPI_OVERRIDE_USER_PASSWORD
 - Change the myminio default passwords. Make sure greater than 8 characters
-    - JUPI_MYMINIO_ACCESS_KEY
-    - JUPI_MYMINIO_SECRET_KEY
+    - MINIO_ACCESS_KEY
+    - MINIO_SECRET_KEY
+
+## Device Share - Balena
+
+Device share service (/sds/) is used when the environment is running on a balena device to aid in discovery, network/wifi configuration, auto fallback to link-local on eth0 when no dhcp detected, and other various utils such as blinking and rebooting. [Device Connect](https://sdc.ash.samtec.services/sdc/install/) is a client app for your host machine. API route docs can be found at http://[device addr]/sds/docs. Full docs of Device Share can be found at <https://bitbucket.org/samteccmd/samtecdeviceshare/src/master/>. This service 

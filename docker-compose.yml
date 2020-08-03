@@ -1,5 +1,20 @@
 version: '2.1'
 services:
+  myminio:
+    build: 
+      context: ./minio
+      dockerfile: ${MYMINIO_DOCKERFILE}
+    ports:
+      - "9000:9000"
+    env_file: 
+      - .env
+    #environment:
+      #- MINIO_ACCESS_KEY: 
+      #- MINIO_SECRET_KEY: 
+    volumes:
+      - 'myminio-data:/data'
+      - 'myminio-program:/program'
+    command: ["minio", "server", "/data"] # "--certs-dir", "/program/minio"]
   sds:
     build: sds
     ports:
@@ -37,13 +52,12 @@ services:
       #- JUPI_AWS_SECRET_ACCESS_KEY
       #- JUPI_DEFAULT_USER_PASSWORD
       #- JUPI_OVERRIDE_USER_PASSWORD
-      #- JUPI_MYMINIO_ACCESS_KEY
-      #- JUPI_MYMINIO_SECRET_KEY
+      #- MINIO_ACCESS_KEY
+      #- MINIO_SECRET_KEY
     depends_on: 
       - myminio
     devices:
       - "/dev/i2c-1:/dev/i2c-1"
-      - "/dev/mem:/dev/mem"
     cap_add:
       - SYS_RAWIO
     labels:
@@ -65,22 +79,6 @@ services:
       - myminio
     ports:
       - 80:80
-  myminio:
-    build: 
-      context: ./minio
-      dockerfile: ${MYMINIO_DOCKERFILE}
-    ports:
-      - "9000:9000"
-    env_file: 
-      - .env
-    #environment:
-      #- MINIO_ACCESS_KEY: 
-      #- MINIO_SECRET_KEY: 
-    volumes:
-      - 'myminio-data:/data'
-      - 'myminio-program:/program'
-    entrypoint: ["env", "MINIO_ACCESS_KEY=${JUPI_MYMINIO_ACCESS_KEY}", "env", "MINIO_SECRET_KEY=${JUPI_MYMINIO_SECRET_KEY}", "/usr/bin/docker-entrypoint.sh"]
-    command: ["minio", "server", "/data", "--certs-dir", "/program/minio"]
 volumes:
      logs-volume: 
      nb-program:
