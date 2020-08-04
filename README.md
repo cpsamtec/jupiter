@@ -139,9 +139,10 @@ Jupyter and Code Server credentials can be found by
   - password is _dev_ (configurable w/ JUPI_OVERRIDE_USER_PASSWORD)
 
 Services can be accessed at http://[environment address]/[service]
-    - **code** Code Server: In browser VSCode
-    - **lab** Jupyter Lab: Python notebooks
-    - **sds** Device Share: Support when running on balena device to discover and configure network/wifi, reboot, get info
+
+- **code** Code Server: In browser VSCode
+- **lab** Jupyter Lab: Python notebooks
+- **sds** Device Share: Support when running on balena device to discover and configure network/wifi, reboot, get info
 
 ## WIFI/Network - Jupiter on a Balena device
 
@@ -256,4 +257,4 @@ For service notebook
 
 ## Device Share - Balena
 
-Device share service (/sds/) is used when the environment is running on a balena device to aid in discovery, network/wifi configuration, auto fallback to link-local on eth0 when no dhcp detected, and other various utils such as blinking and rebooting. [Device Connect](https://sdc.ash.samtec.services/sdc/install/) is a client app for your host machine. API route docs can be found at http://[device addr]/sds/docs. Full docs of Device Share can be found at <https://bitbucket.org/samteccmd/samtecdeviceshare/src/master/>. This service 
+Device share service (/sds/) is used when the environment is running on a balena device to aid in discovery, network/wifi configuration, auto fallback to link-local on eth0 when no dhcp detected, and other various utils such as blinking and rebooting. [Device Connect](https://sdc.ash.samtec.services/sdc/install/) is a client app for your host machine. API route docs can be found at http://[device addr]/sds/docs. Full docs of Device Share can be found at <https://bitbucket.org/samteccmd/samtecdeviceshare/src/master/>.
