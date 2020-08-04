@@ -144,23 +144,6 @@ Services can be accessed at http://[environment address]/[service]
 - **lab** Jupyter Lab: Python notebooks
 - **sds** Device Share: Support when running on balena device to discover and configure network/wifi, reboot, get info
 
-## WIFI/Network - Jupiter on a Balena device
-
-By default a hotspot is created on wifi enabled devices. Look for WIFI network with name SDC-XXXXXXX where XXXXXXX is the 7 digit balena id. The password can be set/found under environment variables on the balena app dashboard. Look for SDC_WIFI_PASS. This is provided by the **Device Share** service discussed futher at end of the README.
-
-Other useful environment variables are as followed. They can be set in the jupiter-xxxx application section of the balena console <https://dashboard.balena-cloud.com/> for the service **sds**.
-
-| Name              | Description                   | Default                                     |
-| ----------------- | ----------------------------- | ------------------------------------------- |
-| SDC_WIFI_TYPE     | enum: HOTSPOT CLIENT DISABLED | HOTSPOT                                     |
-| SDC_WIFI_SSID     | WiFi SSID                     | SDC-${**BALENA_PREFIX**_DEVICE_UUID}        |
-| SDC_WIFI_PASS     | WiFi passphrase               | samtec1!                                    |
-| SDC_WIFI_IFACE    | WiFi hardware interface       | wlan0                                       |
-| ETH_DISABLE       | Disable ethernet              | null                                        |
-| ETH_TARGET_NAME   | Eth hardware interface        | null                                        |
-| ETH_DHCP_TIMEOUT  | Timeout to get DHCP address   | 15                                          |
-| ETH_LOCAL_TIMEOUT | Timeout to get autoip address | 30                                          |
-
 ## Development
 
 ### Jupyter Lab
@@ -255,6 +238,24 @@ For service notebook
 - Change the runtime user password for dev. Will be different than what is in generated image
     - JUPI_OVERRIDE_USER_PASSWORD
 
-## Device Share - Balena
+## Device Share - For Jupiter on a Balena device
 
 Device share service (/sds/) is used when the environment is running on a balena device to aid in discovery, network/wifi configuration, auto fallback to link-local on eth0 when no dhcp detected, and other various utils such as blinking and rebooting. [Device Connect](https://sdc.ash.samtec.services/sdc/install/) is a client app for your host machine. API route docs can be found at http://[device addr]/sds/docs. Full docs of Device Share can be found at <https://bitbucket.org/samteccmd/samtecdeviceshare/src/master/>.
+
+### WIFI/Network
+
+By default a hotspot is created on wifi enabled devices. Look for WIFI network with name SDC-XXXXXXX where XXXXXXX is the 7 digit balena id. The password can be set/found under environment variables on the balena app dashboard. Look for SDC_WIFI_PASS. This is provided by the **Device Share** service discussed futher at end of the README.
+
+Other useful environment variables are as followed. They can be set in the jupiter-xxxx application section of the balena console <https://dashboard.balena-cloud.com/> for the service **sds**.
+
+| Name              | Description                   | Default                                     |
+| ----------------- | ----------------------------- | ------------------------------------------- |
+| SDC_WIFI_TYPE     | enum: HOTSPOT CLIENT DISABLED | HOTSPOT                                     |
+| SDC_WIFI_SSID     | WiFi SSID                     | SDC-${**BALENA_PREFIX**_DEVICE_UUID}        |
+| SDC_WIFI_PASS     | WiFi passphrase               | samtec1!                                    |
+| SDC_WIFI_IFACE    | WiFi hardware interface       | wlan0                                       |
+| ETH_DISABLE       | Disable ethernet              | null                                        |
+| ETH_TARGET_NAME   | Eth hardware interface        | null                                        |
+| ETH_DHCP_TIMEOUT  | Timeout to get DHCP address   | 15                                          |
+| ETH_LOCAL_TIMEOUT | Timeout to get autoip address | 30                                          |
+
