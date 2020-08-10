@@ -30,7 +30,7 @@ services:
     env_file: 
       - .env
     environment:
-      - UDEV=1
+      - UDEV=on
       #- JUPI_VIM_USER 
       #- JUPI_CREDENTIAL_VERSION
       #- JUPI_AWS_ACCESS_KEY_ID

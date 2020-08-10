@@ -199,6 +199,10 @@ A device with minio command line client. You can use the command line client **m
 Further client documentation can be found here
 [Minio Client](https://docs.min.io/docs/minio-client-quickstart-guide.html)
 
+## Exposed user ports
+
+By default ports 33000 and 34000 are exposed. If you are the environment is running on balena you can access these ports publicly by going to the public blanea url and appending **/dev/33000** or **/dev/34000** to the path. Example https://xxxxxxxxxxxx.balena-devices.com/dev/33000/myapi
+
 ## Software Tools
 
 The following tools have been installed and are ready to use.
