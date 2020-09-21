@@ -30,7 +30,7 @@ RUN apt-get update && \
  nano libopenmpi-dev libopenblas-dev libreadline-dev libffi-dev liblapack-dev libhdf5-openmpi-dev hdf5-tools \
   libfreetype6-dev openssl dropbear wget curl rsync psmisc procps i2c-tools gfortran gcc llvm \
  nodejs npm zip gpiod libtinfo5 libzmq3-dev  \
- python3 python3-dev python3-botocore python3-boto3 python3-numpy python3-scipy cython \
+ python3 python3-dev python3-botocore python3-boto3 python3-numpy python3-scipy \
  python3-matplotlib libhdf5-dev python3-pandas python3-h5py python3-arrow python3-dbus libdbus-glib-1-dev && \
  apt-get clean && \
  echo "Installed packages successfully."
