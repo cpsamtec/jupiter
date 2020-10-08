@@ -98,7 +98,7 @@ fi
 # Check if jupyter notebook config exists. If not create it with delete to trash false
 if [ ! -f "/home/dev/.jupyter/jupyter_notebook_config.py" ]; then 
   su -w "PATH" - dev -c "jupyter notebook --generate-config && 
-    sed -i 's/#c.FileContentsManager.delete_to_trash.*/c.FileContentsManager.delete_to_trash = False/' '/home/dev/.jupyter/jupyter_notebook_config.py'"
+    sed -i -e 's/#c.FileContentsManager.delete_to_trash.*/c.FileContentsManager.delete_to_trash = False/' -e 's/#c.NotebookApp.allow_password_change = True*/c.NotebookApp.allow_password_change = True/' '/home/dev/.jupyter/jupyter_notebook_config.py'"
 fi
 
 # Make sure dev user can run docker commands
