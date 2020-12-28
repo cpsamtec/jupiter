@@ -106,6 +106,8 @@ if [ -e /var/run/docker.sock ]; then
   chgrp docker /var/run/docker.sock
 fi
 
+su -w "JUPI_AIRFLOW_SECRET_KEY,JUPI_AIRFLOW_WEB_BASE_URL,PATH,CARGO_HOME,BALENA_DEVICE_UUID" - dev -c "/app/airflow.sh &"
+
 # Start the first process
 cd /code
 su -w "JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,CARGO_HOME,RUSTUP_HOME,BALENA_DEVICE_UUID" - dev -c "code-server --bind-addr 0.0.0.0:8080 /code &"
@@ -163,6 +165,8 @@ fi
 
 sleep 20
 su - dev -c "bash ${DIR}/credentials.sh > /tmp/credentials.txt"
+service cron start 
+service grafana-server start
 
 while sleep 60; do
   ps aux |grep code-server | grep -q -v grep

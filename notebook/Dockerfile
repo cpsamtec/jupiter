@@ -62,8 +62,16 @@ RUN chmod +x /usr/local/bin/docker-compose && ln -s /usr/local/bin/docker-compos
 
 
 
+RUN apt-get update && apt-get install -y cron && \
+    apt-get install -y apt-transport-https && \
+    apt-get install -y software-properties-common wget && \
+    wget -q -O - https://packages.grafana.com/gpg.key | apt-key add - && \
+    echo "deb https://packages.grafana.com/oss/deb stable main" | tee -a /etc/apt/sources.list.d/grafana.list && \
+    apt-get update && apt-get install grafana && sed -i 's/.*http_port = .*/http_port = 63000/' /etc/grafana/grafana.ini && \
+    apt-get clean
+
 RUN pip3 install --upgrade dash-table dash-bootstrap-components jupyterlab-s3-browser jupyterlab-git jupyter-dash boto3 minio plotly dash qgrid \
-    aioboto3 psutil  fastparquet requests 
+    aioboto3 psutil  fastparquet requests apache-airflow>=1.10.14 pyyaml 
  # h5py cannot find <mpi.h>
 RUN su - dev -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash"
 RUN su - dev -c "curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python"
@@ -99,4 +107,7 @@ RUN addgroup spi && usermod -aG spi dev
 RUN echo 'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:${PATH}' > /etc/profile.d/01-path-fix.sh 
 RUN addgroup docker --gid 988 && \
   usermod -aG docker dev 
+
+RUN sed -i -e 's/.*serve_from_sub_path = .*/serve_from_sub_path = true/' -e 's!.*root_url = .*!root_url = %(protocol)s://%(domain)s:%(http_port)s/grafana/!' /etc/grafana/grafana.ini 
+RUN chown root.crontab /usr/bin/crontab && chmod g+s /usr/bin/crontab
 CMD [ "/bin/bash", "/app/progs_wrapper.sh" ]

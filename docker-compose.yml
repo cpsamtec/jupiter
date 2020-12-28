@@ -26,7 +26,9 @@ services:
       - "8050:8050" # dash server, spare
       - "33000:33000" # spare 
       - "34000:34000" # spare 
-      - "8888:8888" # jupyter notebook  local
+      - "8888:8888" # jupyter notebook local
+      - "63000:63000" # grafana
+      - "64000:64000" # airflow
     env_file: 
       - .env
     environment:
@@ -50,6 +52,9 @@ services:
       - 'nb-code:/code'
       - 'nb-program:/program'
       - 'nb-home:/home/dev'
+      #- grafana_etc:/etc/grafana
+      - grafana_usr:/usr/share/grafana 
+      - grafana_var:/var/lib/grafana
   nginx:
     build: nginx
     depends_on: 
@@ -65,6 +70,9 @@ volumes:
      nb-home:
      myminio-program:
      myminio-data:
+     #grafana_etc:
+     grafana_usr:
+     grafana_var:
 
 
 
