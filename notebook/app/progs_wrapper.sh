@@ -165,7 +165,6 @@ fi
 
 sleep 20
 su - dev -c "bash ${DIR}/credentials.sh > /tmp/credentials.txt"
-service cron start 
 service grafana-server start
 
 while sleep 60; do
