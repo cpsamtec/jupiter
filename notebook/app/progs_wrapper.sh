@@ -4,9 +4,6 @@ set -x
 printenv 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 JUPI_VIM_USER=${JUPI_VIM_USER:=0}
-if [ -e "${JUPYTERLAB_DIR_VIM}" ] && [ ! -z "${JUPI_VIM_USER}" ] && [ "${JUPI_VIM_USER}" -ne 0 ]; then 
-  JUPYTERLAB_DIR=${JUPYTERLAB_DIR_VIM}
-fi
 
 USER=$(stat -c '%U' /lab)
 if [ $USER != "dev" ]; then 

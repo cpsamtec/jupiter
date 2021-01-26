@@ -28,7 +28,6 @@ A containerized development environment. Can be run on devices supporting amd64/
 
         ```bash
         #used in notebook service
-        JUPI_VIM_USER=0
         JUPI_DEFAULT_USER_PASSWORD=dev
         JUPI_OVERRIDE_USER_PASSWORD=dev
         JUPI_CREDENTIAL_VERSION=1
@@ -63,7 +62,6 @@ A containerized development environment. Can be run on devices supporting amd64/
     2. expose environment variables most have default if not set in the console
 
         - notebook service - have defaults
-            - JUPI_VIM_USER=0
             - JUPI_DEFAULT_USER_PASSWORD=dev
             - JUPI_OVERRIDE_USER_PASSWORD=dev
             - JUPI_CREDENTIAL_VERSION=1 *increment if any access or secret key environment variables change*
@@ -148,9 +146,7 @@ Services can be accessed at http://[environment address]/[service]
 
 ### Jupyter Lab
 
-Extensions have been installed and only need to be enabled. Do not install any further extensions as it will require a full rebuild and always causes problems. If JUPI_VIM_USER is set to 1 vim will be enabled on notebook cells.
-
-From a browser goto
+Extensions have been installed and only need to be enabled. Do not install any further extensions as it will require a full rebuild and always causes problems. From a browser goto
 
 - On same local network
   - http://[environment address]/lab
@@ -230,8 +226,6 @@ The overriding dockerfile mounts the appropriate docker.sock volume. You can cre
 
 For service notebook
 
-- Enable/Disable VIM mode and extensions in Jupyter Lab and Code Server. 0 - Disabled (default), 1 - Enabled
-    - JUPI_VIM_USER
 - Enable minio client to access AWS S3. ~/.aws/credentials also configured. (ex. mc ls s3/)
     - JUPI_AWS_ACCESS_KEY_ID
     - JUPI_AWS_SECRET_ACCESS_KEY

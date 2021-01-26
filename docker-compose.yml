@@ -33,7 +33,6 @@ services:
       - .env
     environment:
       - UDEV=on
-      #- JUPI_VIM_USER 
       #- JUPI_CREDENTIAL_VERSION
       #- JUPI_AWS_ACCESS_KEY_ID
       #- JUPI_AWS_SECRET_ACCESS_KEY
