@@ -117,7 +117,8 @@ fi
 
 # Start the second process
 cd /lab
-su -w "JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,JUPYTERLAB_DIR,BALENA_DEVICE_UUID" - dev  -c "cd /lab; jupyter notebook --no-browser --ip=* --port=8082 &"
+JUPI_NOTEBOOK_TOKEN=${JUPI_NOTEBOOK_TOKEN:-${BALENA_DEVICE_UUID:-jupiter}}
+su -w "JUPI_NOTEBOOK_TOKEN,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,JUPYTERLAB_DIR,BALENA_DEVICE_UUID" - dev  -c "cd /lab; jupyter notebook --NotebookApp.token=${JUPI_NOTEBOOK_TOKEN} --no-browser --ip=* --port=8082 &"
 #jupyter notebook --allow-root --no-browser --ip=* --port=8082 &
 status=$?
 if [ $status -ne 0 ]; then
@@ -161,7 +162,7 @@ if [ -e /dev/gpiomem ]; then
 fi
 
 sleep 20
-su - dev -c "bash ${DIR}/credentials.sh > /tmp/credentials.txt"
+su -w "JUPI_NOTEBOOK_TOKEN,BALENA_DEVICE_UUID" - dev -c "bash ${DIR}/credentials.sh > /tmp/credentials.txt"
 service grafana-server start
 
 while sleep 60; do
