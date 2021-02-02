@@ -64,7 +64,7 @@ RUN chmod +x /usr/local/bin/docker-compose && ln -s /usr/local/bin/docker-compos
 
 RUN apt-get update && \
     apt-get install -y apt-transport-https && \
-    apt-get install -y software-properties-common wget && \
+    apt-get install -y software-properties-common wget lsof && \
     wget -q -O - https://packages.grafana.com/gpg.key | apt-key add - && \
     echo "deb https://packages.grafana.com/oss/deb stable main" | tee -a /etc/apt/sources.list.d/grafana.list && \
     apt-get update && apt-get install grafana && sed -i 's/.*http_port = .*/http_port = 63000/' /etc/grafana/grafana.ini && \
