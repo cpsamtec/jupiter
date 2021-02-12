@@ -64,7 +64,7 @@ RUN chmod +x /usr/local/bin/docker-compose && ln -s /usr/local/bin/docker-compos
 
 RUN apt-get update && \
     apt-get install -y apt-transport-https && \
-    apt-get install -y software-properties-common wget lsof && \
+    apt-get install -y software-properties-common wget bsdmainutils lsof && \
     wget -q -O - https://packages.grafana.com/gpg.key | apt-key add - && \
     echo "deb https://packages.grafana.com/oss/deb stable main" | tee -a /etc/apt/sources.list.d/grafana.list && \
     apt-get update && apt-get install grafana && sed -i 's/.*http_port = .*/http_port = 63000/' /etc/grafana/grafana.ini && \
@@ -74,6 +74,10 @@ RUN pip3 install --ignore-installed --upgrade boto3 minio plotly dash qgrid \
     aioboto3 psutil  fastparquet requests apache-airflow>=1.10.14 pyyaml \
     'dramatiq[rabbitmq, watch]' 
 
+ENV CARGO_HOME=/dev-apps/sdk/cargo
+ENV RUSTUP_HOME=/dev-apps/sdk/rustup
+RUN su -w "CARGO_HOME,RUSTUP_HOME" - dev -c "mkdir -p ${CARGO_HOME} ${RUSTUP_HOME} && curl https://sh.rustup.rs -sSf | bash -s -- -y"
+ENV PATH="${PATH}:${CARGO_HOME}/bin"
 RUN su - dev -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash"
 RUN su - dev -c "curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python"
 ENV CARGO_HOME=/dev-apps/sdk/cargo
@@ -104,4 +108,8 @@ RUN addgroup docker --gid 988 && \
   usermod -aG docker dev 
 
 RUN sed -i -e 's/.*serve_from_sub_path = .*/serve_from_sub_path = true/' -e 's!.*root_url = .*!root_url = %(protocol)s://%(domain)s:%(http_port)s/grafana/!' /etc/grafana/grafana.ini 
+RUN export DOCKERVERSION=20.10.3 && export CURR_ARCH=$(uname -i) && echo ${CURR_ARCH} && \ 
+   curl -fsSLO https://download.docker.com/linux/static/stable/${CURR_ARCH}/docker-${DOCKERVERSION}.tgz && \
+   tar xzvf docker-${DOCKERVERSION}.tgz --strip 1  -C /usr/local/bin docker/docker && \
+   rm docker-${DOCKERVERSION}.tgz
 CMD [ "/bin/bash", "/app/progs_wrapper.sh" ]
