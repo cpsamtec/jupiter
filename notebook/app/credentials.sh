@@ -12,7 +12,8 @@ if [ ! -z ${BALENA_DEVICE_UUID} ]; then
     echo "jupyter lab located remotely at"
     echo "https://${BALENA_DEVICE_UUID}.balena-devices.com/lab?token=${token}"
 fi
-code_pass=$(cat /home/dev/.config/code-server/config.yaml | sed -n 's/^password: \([a-zA-Z0-9]\+\)/\1/p')
+#code_pass=$(cat /home/dev/.config/code-server/config.yaml | sed -n 's/^password: \([a-zA-Z0-9]\+\)/\1/p')
+code_pass=${JUPI_CODESERVER_TOKEN:-${BALENA_DEVICE_UUID:-jupiter}}
 echo "code server password is ${code_pass}"
 if [ ! -z ${BALENA_DEVICE_UUID} ]; then
     echo "code located locally at"

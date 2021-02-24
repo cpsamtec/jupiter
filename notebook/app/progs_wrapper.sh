@@ -107,7 +107,8 @@ su -w "JUPI_AIRFLOW_SECRET_KEY,JUPI_AIRFLOW_WEB_BASE_URL,PATH,CARGO_HOME,BALENA_
 
 # Start the first process
 cd /code
-su -w "JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,CARGO_HOME,RUSTUP_HOME,BALENA_DEVICE_UUID" - dev -c "code-server --bind-addr 0.0.0.0:8080 /code &"
+JUPI_CODESERVER_TOKEN=${JUPI_CODESERVER_TOKEN:-${BALENA_DEVICE_UUID:-jupiter}}
+su -w "JUPI_CODESERVER_TOKEN,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,CARGO_HOME,RUSTUP_HOME,BALENA_DEVICE_UUID" - dev -c "PASSWORD=${JUPI_CODESERVER_TOKEN} code-server --bind-addr 0.0.0.0:8080 /code &"
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start code-server: $status"
@@ -118,6 +119,7 @@ fi
 # Start the second process
 cd /lab
 JUPI_NOTEBOOK_TOKEN=${JUPI_NOTEBOOK_TOKEN:-${BALENA_DEVICE_UUID:-jupiter}}
+JUPI_CODESERVER_TOKEN=${JUPI_CODESERVER_TOKEN:-${BALENA_DEVICE_UUID:-jupiter}}
 su -w "JUPI_NOTEBOOK_TOKEN,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,JUPYTERLAB_DIR,BALENA_DEVICE_UUID" - dev  -c "cd /lab; jupyter notebook --NotebookApp.token=${JUPI_NOTEBOOK_TOKEN} --no-browser --ip=* --port=8082 &"
 #jupyter notebook --allow-root --no-browser --ip=* --port=8082 &
 status=$?

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash 
-set -e
+#set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR/.. 
 
@@ -124,6 +124,9 @@ sub_deploy(){
             ;;
     esac
     balena deploy --projectName ${JUPI_PROJECT_NAME} ${BALENA_BUILD_ARGS} ${JUPI_PROJECT_NAME} 
+    if [ $? -ne 0 ]; then 
+        balena deploy ${JUPI_PROJECT_NAME} --projectName ${JUPI_PROJECT_NAME} ${BALENA_BUILD_ARGS} 
+    fi
 }
   
 subcommand=$1
