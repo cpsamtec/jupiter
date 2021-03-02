@@ -17,6 +17,15 @@ USER=$(stat -c '%U' /home/dev)
 if [ $USER != "dev" ]; then 
   chown -R dev:dev /home/dev 
 fi
+docker_gid=''
+if [ -e /var/run/balena.sock ]; then
+  docker_gid=$(stat -c '%g' /var/run/balena.sock) 
+elif [ -e /var/run/docker.sock ]; then
+  docker_gid=$(stat -c '%g' /var/run/docker.sock) 
+fi
+if [ ! -z $docker_gid ]; then
+  groupmod -g $docker_gid docker
+fi
 
 CONFIG_VERSION=3
 if [ ! -e /program/.jupiter/jupiter_config_version ] || [ "$(cat /program/.jupiter/jupiter_config_version)" != $CONFIG_VERSION ]; then
