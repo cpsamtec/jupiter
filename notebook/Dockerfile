@@ -77,21 +77,8 @@ RUN su -w "CARGO_HOME,RUSTUP_HOME" - dev -c "mkdir -p ${CARGO_HOME} ${RUSTUP_HOM
 ENV PATH="${PATH}:${CARGO_HOME}/bin"
 
 RUN npm install n -g && n stable
-COPY --from=arch_loader /out/minio/bin/mc /usr/bin/mc
-COPY /app/ /app/
-ENV SHELL=/bin/bash
-ENV PATH="${PATH}:/home/dev/.local/bin"
-RUN echo "dev:${JUPI_DEFAULT_USER_PASSWORD:-dev}" | chpasswd
-RUN usermod -aG i2c dev && usermod -aG dialout dev
-RUN addgroup gpio && usermod -aG gpio dev
-RUN addgroup spi && usermod -aG spi dev
-RUN echo 'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:${PATH}' > /etc/profile.d/01-path-fix.sh 
-# video gives non root access to nvidia
-RUN usermod -aG video dev 
-RUN addgroup docker && \
-  usermod -aG docker dev 
-
 RUN pip3 install lckr-jupyterlab-variableinspector ipywidgets 
+
 ENV JUPYTERLAB_DIR_DEFAULT=/user-ext/dev/lab/default 
 RUN mkdir -p ${JUPYTERLAB_DIR_DEFAULT} 
 RUN chown -R dev:dev /user-ext/dev/
@@ -116,4 +103,18 @@ RUN printf '%s\n' \
   \
 >> /root/.bashrc && cat /root/.bashrc
 
+ENV SHELL=/bin/bash
+ENV PATH="${PATH}:/home/dev/.local/bin"
+RUN echo "dev:${JUPI_DEFAULT_USER_PASSWORD:-dev}" | chpasswd
+RUN usermod -aG i2c dev && usermod -aG dialout dev
+RUN addgroup gpio && usermod -aG gpio dev
+RUN addgroup spi && usermod -aG spi dev
+RUN echo 'export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:${PATH}' > /etc/profile.d/01-path-fix.sh 
+# video gives non root access to nvidia
+RUN usermod -aG video dev 
+RUN addgroup docker && \
+  usermod -aG docker dev 
+
+COPY --from=arch_loader /out/minio/bin/mc /usr/bin/mc
+COPY /app/ /app/
 CMD [ "/bin/bash", "/app/progs_wrapper.sh" ]

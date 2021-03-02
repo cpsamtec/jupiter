@@ -32,3 +32,10 @@ python3 setup.py bdist_wheel
 python3 setup.py install 
 # max performance
 # sudo nvpmodel -m 0
+# note: below will be needed to run 
+#export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}/usr/lib/aarch64-linux-gnu/libgomp.so.1
+#export CUDA_HOME=/usr/local/cuda-10.2
+#export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}${CUDA_HOME}/lib64
+#export PATH=${PATH:+${PATH}:}${CUDA_HOME}/bin
+# note: below for jupyter notebook only
+#export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
