@@ -25,11 +25,24 @@ git apply --stat /usr/src/app/pytorch-1_7-jetpack-4_4_1.patch  && git apply /usr
 python3 setup.py bdist_wheel
 python3 setup.py install
 cd ..
+
 sudo apt-get install libjpeg-dev zlib1g-dev libpython3-dev libavcodec-dev libavformat-dev libswscale-dev
 git clone --recursive --branch v0.8.2 https://github.com/pytorch/vision.git
 cd vision
+export BUILD_VERSION=0.8.2
+export FORCE_CUDA=1
 python3 setup.py bdist_wheel
 python3 setup.py install 
+cd ..
+
+export CUPY_NVCC_GENERATE_CODE="arch=compute_53,code=sm_53;arch=compute_62,code=sm_62;arch=compute_72,code=sm_72"
+pip install -vvv cupy==8.5
+#or git clone
+git clone --branch v8.5.0 --recursive https://github.com/cupy/cupy.git
+cd cupy
+python3 setup.py bdist_wheel
+cd ..
+pip install fastai==2.2.6
 # max performance
 # sudo nvpmodel -m 0
 # note: below will be needed to run 
