@@ -1,4 +1,3 @@
-#FROM arm64v8/ubuntu:focal as nb_pre_base
 FROM balenalib/aarch64-ubuntu:focal-build as nb_pre_base
 RUN echo "deb https://repo.download.nvidia.com/jetson/common r32.4 main" >>  /etc/apt/sources.list.d/nvidia.list \
     && echo "deb https://repo.download.nvidia.com/jetson/t194 r32.4 main" >>  /etc/apt/sources.list.d/nvidia.list \
@@ -7,8 +6,6 @@ RUN echo "deb https://repo.download.nvidia.com/jetson/common r32.4 main" >>  /et
 
 
 FROM nb_pre_base
-#FROM balenalib/jetson-xavier-ubuntu:focal
-#RUN sed -i 's/r32 main/r32.4 main/g' /etc/apt/sources.list.d/nvidia.list && apt-get update
 
 WORKDIR /usr/src/app
 
