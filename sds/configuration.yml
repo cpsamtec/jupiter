@@ -1,0 +1,29 @@
+rest_address: 0.0.0.0
+rest_port: 47546
+root_path: "/sds"
+app_name: Jupiter
+app_img_path: /sds/img.png
+app_web_port: 80
+wired_networks:
+  - {
+      iface: eth0,
+      method: auto,
+      timeout: 120,
+      fallback: link-local,
+      fallback_timeout: -1,
+    }
+  - {
+      iface_regex: "enp[0-1]s[0-1]u[0-3]",
+      method: auto,
+      timeout: 15,
+      fallback: link-local,
+      fallback_timeout: 30,
+    }
+wireless_networks:
+  - {
+      mode: HOTSPOT,
+      ssid: "",
+      passphrase: jupiter,
+      default: true,
+      iface: wlan0,
+    }
