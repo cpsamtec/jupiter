@@ -1,6 +1,6 @@
-ARG NOTEBOOK_BASE_IMAGE 
+ARG JUPI_NOTEBOOK_BASE_NAME 
 ARG BASE_IMAGE_ARCH 
-FROM ${NOTEBOOK_BASE_IMAGE} as arch_loader
+FROM ${JUPI_NOTEBOOK_BASE_NAME} as arch_loader
 
 RUN mkdir -p /out/minio/bin
 RUN mkdir -p /out/clang
@@ -22,8 +22,8 @@ RUN if [ "$BASE_IMAGE_ARCH" = "arm32v7" ] ; then \
     fi
 RUN chmod +x /out/minio/bin/mc
 
-ARG NOTEBOOK_BASE_IMAGE 
-FROM $NOTEBOOK_BASE_IMAGE 
+ARG JUPI_NOTEBOOK_BASE_NAME 
+FROM $JUPI_NOTEBOOK_BASE_NAME 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' -y golang git cmake avahi-utils iputils-ping sudo build-essential vim \
     nano libopenmpi-dev libopenblas-dev libreadline-dev libffi-dev liblapack-dev libhdf5-openmpi-dev hdf5-tools \
