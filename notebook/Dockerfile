@@ -72,12 +72,10 @@ ENV CARGO_HOME=/dev-apps/sdk/cargo
 ENV RUSTUP_HOME=/dev-apps/sdk/rustup
 RUN su -w "CARGO_HOME,RUSTUP_HOME" - dev -c "mkdir -p ${CARGO_HOME} ${RUSTUP_HOME} && curl https://sh.rustup.rs -sSf | bash -s -- -y"
 ENV PATH="${PATH}:${CARGO_HOME}/bin"
+RUN su -w "PATH,CARGO_HOME,RUSTUP_HOME" - dev -c "/dev-apps/sdk/cargo/bin/cargo install --features=ssl websocat"
+
 RUN su - dev -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash"
 RUN su - dev -c "curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python"
-ENV CARGO_HOME=/dev-apps/sdk/cargo
-ENV RUSTUP_HOME=/dev-apps/sdk/rustup
-RUN su -w "CARGO_HOME,RUSTUP_HOME" - dev -c "mkdir -p ${CARGO_HOME} ${RUSTUP_HOME} && curl https://sh.rustup.rs -sSf | bash -s -- -y"
-ENV PATH="${PATH}:${CARGO_HOME}/bin"
 
 
 ENV JUPYTERLAB_DIR_DEFAULT=/user-ext/dev/lab/default 
@@ -97,6 +95,8 @@ RUN export DOCKERVERSION=20.10.3 && export CURR_ARCH=$(uname -i) && echo ${CURR_
     tar xzvf docker-${DOCKERVERSION}.tgz --strip 1  -C /usr/local/bin docker/docker && \
     rm docker-${DOCKERVERSION}.tgz
 
+RUN pip3 install --no-cache-dir apache-airflow==2.0.1 \
+    --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.0.1/constraints-3.7.txt"
 
 RUN printf '%s\n' \
     'if [ -e "/var/run/balena.sock" ]; then' \ 

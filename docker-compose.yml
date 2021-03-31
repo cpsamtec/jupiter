@@ -1,4 +1,4 @@
-version: '2.1'
+version: "2.1"
 services:
   sds:
     build: sds
@@ -12,25 +12,26 @@ services:
       - ETH_DISABLE=1
       - SDC_WIFI_TYPE=DISABLED
     volumes:
-      - 'logs-volume:/tmp/logs'
+      - "logs-volume:/tmp/logs"
     labels:
-      io.balena.features.supervisor-api: '1'
-      io.balena.features.balena-api: '1'
-      io.balena.features.dbus: '1'
+      io.balena.features.supervisor-api: "1"
+      io.balena.features.balena-api: "1"
+      io.balena.features.dbus: "1"
   notebook:
     build: notebook
     ipc: host
     privileged: true
     ports:
-      - "8080:8080" # code server local 
+      - "8080:8080" # code server local
       - "28282:22" # ssh
       - "8050:8050" # dash server, spare
-      - "33000:33000" # spare 
-      - "34000:34000" # spare 
+      - "8022:8022"
+      - "33000:33000" # spare
+      - "34000:34000" # spare
       - "8888:8888" # jupyter notebook local
       - "63000:63000" # grafana
       - "64000:64000" # airflow
-    env_file: 
+    env_file:
       - .env
     environment:
       - UDEV=on
@@ -42,37 +43,34 @@ services:
     cap_add:
       - SYS_RAWIO
     labels:
-      io.balena.features.dbus: '1'
-      io.balena.features.balena-socket: '1'
-      io.balena.features.firmware: '1'
-      io.balena.features.kernel-modules: '1'
+      io.balena.features.dbus: "1"
+      io.balena.features.balena-socket: "1"
+      io.balena.features.firmware: "1"
+      io.balena.features.kernel-modules: "1"
     volumes:
-      - 'logs-volume:/tmp/logs'
-      - 'nb-lab:/lab'
-      - 'nb-code:/code'
-      - 'nb-program:/program'
-      - 'nb-home:/home/dev'
+      - "logs-volume:/tmp/logs"
+      - "nb-lab:/lab"
+      - "nb-code:/code"
+      - "nb-program:/program"
+      - "nb-home:/home/dev"
       #- grafana_etc:/etc/grafana
-      - grafana_usr:/usr/share/grafana 
+      - grafana_usr:/usr/share/grafana
       - grafana_var:/var/lib/grafana
   nginx:
     build: nginx
-    depends_on: 
-      - sds 
+    depends_on:
+      - sds
       - notebook
     ports:
       - 80:80
 volumes:
-     logs-volume: 
-     nb-program:
-     nb-code:
-     nb-lab:
-     nb-home:
-     myminio-program:
-     myminio-data:
-     #grafana_etc:
-     grafana_usr:
-     grafana_var:
-
-
-
+  logs-volume:
+  nb-program:
+  nb-code:
+  nb-lab:
+  nb-home:
+  myminio-program:
+  myminio-data:
+  #grafana_etc:
+  grafana_usr:
+  grafana_var:

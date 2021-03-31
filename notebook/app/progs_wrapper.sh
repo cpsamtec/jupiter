@@ -112,12 +112,12 @@ if [ -e /var/run/docker.sock ]; then
   chgrp docker /var/run/docker.sock
 fi
 
-su -w "JUPI_AIRFLOW_SECRET_KEY,JUPI_AIRFLOW_WEB_BASE_URL,PATH,BALENA_DEVICE_UUID" - dev -c "/app/airflow.sh &"
+su -w "CARGO_HOME,RUSTUP_HOME,JUPI_AIRFLOW_SECRET_KEY,JUPI_AIRFLOW_WEB_BASE_URL,PATH,BALENA_DEVICE_UUID" - dev -c "/app/airflow.sh &"
 
 # Start the first process
 cd /code
 JUPI_CODESERVER_TOKEN=${JUPI_CODESERVER_TOKEN:-${BALENA_DEVICE_UUID:-jupiter}}
-su -w "JUPI_CODESERVER_TOKEN,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,RUSTUP_HOME,BALENA_DEVICE_UUID" - dev -c "if [ -e /code/.jupi_dev_env ]; then source /code/.jupi_dev_env; fi; PASSWORD=${JUPI_CODESERVER_TOKEN} code-server --bind-addr 0.0.0.0:8080 /code &"
+su -w "JUPI_CODESERVER_TOKEN,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,CARGO_HOME,RUSTUP_HOME,BALENA_DEVICE_UUID" - dev -c "if [ -e /code/.jupi_dev_env ]; then source /code/.jupi_dev_env; fi; PASSWORD=${JUPI_CODESERVER_TOKEN} code-server --bind-addr 0.0.0.0:8080 /code &"
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start code-server: $status"
@@ -129,7 +129,7 @@ fi
 cd /lab
 JUPI_NOTEBOOK_TOKEN=${JUPI_NOTEBOOK_TOKEN:-${BALENA_DEVICE_UUID:-jupiter}}
 JUPI_CODESERVER_TOKEN=${JUPI_CODESERVER_TOKEN:-${BALENA_DEVICE_UUID:-jupiter}}
-su -w "JUPI_NOTEBOOK_TOKEN,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,JUPYTERLAB_DIR,BALENA_DEVICE_UUID" - dev  -c "cd /lab; if [ -e .jupi_dev_env ]; then source .jupi_dev_env; fi; jupyter notebook --NotebookApp.token=${JUPI_NOTEBOOK_TOKEN} --no-browser --ip=* --port=8082 &"
+su -w "JUPI_NOTEBOOK_TOKEN,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,JUPYTERLAB_DIR,BALENA_DEVICE_UUID,CARGO_HOME,RUSTUP_HOME" - dev  -c "cd /lab; if [ -e .jupi_dev_env ]; then source .jupi_dev_env; fi; jupyter notebook --NotebookApp.token=${JUPI_NOTEBOOK_TOKEN} --no-browser --ip=* --port=8082 &"
 #jupyter notebook --allow-root --no-browser --ip=* --port=8082 &
 status=$?
 if [ $status -ne 0 ]; then
@@ -145,6 +145,7 @@ if [ $status -ne 0 ]; then
   echo "Failed to start dropbear: $status"
   exit $status
 fi
+websocat --binary ws-l:0.0.0.0:8022 tcp:127.0.0.1:22 &
 
 for f in /dev/i2c-*; do 
   if [ -e "$f" ]; then 
