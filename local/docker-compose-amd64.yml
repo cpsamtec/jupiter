@@ -1,0 +1,65 @@
+version: "2.1"
+services:
+  sds:
+    image: samtecdistro/jupiter-sds-amd64:latest
+    ports:
+      - "1337:1337"
+      - "47546:47546"
+    environment:
+      - ETH_DISABLE=1
+      - SDC_WIFI_TYPE=DISABLED
+    volumes:
+      - "logs-volume:/tmp/logs"
+    labels:
+      io.balena.features.supervisor-api: "1"
+      io.balena.features.balena-api: "1"
+      io.balena.features.dbus: "1"
+  notebook:
+    image: samtecdistro/jupiter-notebook-amd64:latest
+    ipc: host
+    privileged: true
+    ports:
+      - "8080:8080" # code server local
+      - "28282:22" # ssh
+      - "8050:8050" # dash server, spare
+      - "33000:33000" # spare
+      - "34000:34000" # spare
+      - "8888:8888" # jupyter notebook local
+      - "63000:63000" # grafana
+      - "64000:64000" # airflow
+    env_file:
+      - .env
+    environment:
+      - UDEV=on
+    cap_add:
+      - SYS_RAWIO
+    labels:
+      io.balena.features.dbus: "1"
+      io.balena.features.balena-socket: "1"
+      io.balena.features.firmware: "1"
+      io.balena.features.kernel-modules: "1"
+    volumes:
+      - "logs-volume:/tmp/logs"
+      - "nb-lab:/lab"
+      - "nb-code:/code"
+      - "nb-program:/program"
+      - "nb-home:/home/dev"
+      - grafana_usr:/usr/share/grafana
+      - grafana_var:/var/lib/grafana
+  nginx:
+    image: samtecdistro/jupiter-nginx-amd64:latest
+    depends_on:
+      - sds
+      - notebook
+    ports:
+      - 80:80
+volumes:
+  logs-volume:
+  nb-program:
+  nb-code:
+  nb-lab:
+  nb-home:
+  myminio-program:
+  myminio-data:
+  grafana_usr:
+  grafana_var:
