@@ -36,12 +36,18 @@ python3 setup.py install
 cd ..
 
 export CUPY_NVCC_GENERATE_CODE="arch=compute_53,code=sm_53;arch=compute_62,code=sm_62;arch=compute_72,code=sm_72"
-pip install -vvv cupy==8.5
-#or git clone
-git clone --branch v8.5.0 --recursive https://github.com/cupy/cupy.git
-cd cupy
-python3 setup.py bdist_wheel
-cd ..
+if [ -z $CUPY_GIT_INSTALL ]; then 
+    pip install -vvv cupy==8.5
+else 
+    #or git clone
+    #BEGIN cupy git install
+    git clone --branch v8.5.0 --recursive https://github.com/cupy/cupy.git
+    cd cupy
+    python3 setup.py bdist_wheel
+    python3 setup.py install
+    cd ..
+    #END cupy git install
+fi
 pip install fastai==2.2.6
 # max performance
 # sudo nvpmodel -m 0

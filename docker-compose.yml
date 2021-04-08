@@ -53,6 +53,7 @@ services:
       - "nb-code:/code"
       - "nb-program:/program"
       - "nb-home:/home/dev"
+      - "nb-nginx-conf:/etc/nb-nginx/conf.d"
       #- grafana_etc:/etc/grafana
       - grafana_usr:/usr/share/grafana
       - grafana_var:/var/lib/grafana
@@ -63,12 +64,15 @@ services:
       - notebook
     ports:
       - 80:80
+    volumes:
+      - "nb-nginx-conf:/etc/nb-nginx/conf.d"
 volumes:
   logs-volume:
   nb-program:
   nb-code:
   nb-lab:
   nb-home:
+  nb-nginx-conf:
   myminio-program:
   myminio-data:
   #grafana_etc:

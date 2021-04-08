@@ -59,9 +59,11 @@ RUN pip3 install --ignore-installed --upgrade --no-cache-dir wheel numpy pandas 
     jupyterlab>=3 \
     pyrpio pyrpiic \
     boto3 minio plotly dash qgrid \
-    aioboto3 psutil  fastparquet requests apache-airflow>=1.10.14 pyyaml \
+    aioboto3 psutil  fastparquet requests pyyaml \
     'dramatiq[rabbitmq, watch]' \
-    lckr-jupyterlab-variableinspector ipywidgets docker-compose 
+    docker-compose \
+    lckr-jupyterlab-variableinspector ipywidgets jupyterlab_widgets jupyter-dash \
+    fastapi uvicorn
 
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 #RUN curl -L "https://github.com/docker/compose/releases/download/1.28.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -82,7 +84,8 @@ ENV JUPYTERLAB_DIR_DEFAULT=/user-ext/dev/lab/default
 RUN mkdir -p ${JUPYTERLAB_DIR_DEFAULT} 
 RUN chown -R dev:dev /user-ext/dev/
 ENV JUPYTERLAB_DIR=${JUPYTERLAB_DIR_DEFAULT}
-RUN jupyter-lab build
+RUN jupyter labextension install jupyterlab-plotly && \
+    jupyter-lab build
 
 RUN wget -q -O - https://packages.grafana.com/gpg.key | apt-key add - && \
     echo "deb https://packages.grafana.com/oss/deb stable main" | tee -a /etc/apt/sources.list.d/grafana.list && \

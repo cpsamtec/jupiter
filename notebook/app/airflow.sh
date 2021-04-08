@@ -3,6 +3,8 @@ echo "running airflow"
 set -x
 if [ ! -e ~/airflow/airflow.db ]; then 
   airflow db init
+else 
+  airflow db upgrade
 fi
 
 export AIRFLOW__WEBSERVER__SECRET_KEY=${JUPI_AIRFLOW_SECRET_KEY:-jupiter}
