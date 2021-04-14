@@ -173,6 +173,13 @@ if [ -e /dev/gpiomem ]; then
   chmod g+rw "/dev/gpiomem"
 fi
 
+for f in /dev/gpiochip* ; do 
+  if [ -e "$f" ]; then 
+    chown :gpio "$f" && 
+    chmod g+rw "$f"
+  fi
+done
+
 sleep 5
 su -w "JUPI_NOTEBOOK_TOKEN,BALENA_DEVICE_UUID" - dev -c "bash ${DIR}/credentials.sh > /tmp/credentials.txt"
 service grafana-server start
