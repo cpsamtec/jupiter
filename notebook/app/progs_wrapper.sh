@@ -22,6 +22,7 @@ if [ -e /var/run/balena.sock ]; then
   docker_gid=$(stat -c '%g' /var/run/balena.sock) 
 elif [ -e /var/run/docker.sock ]; then
   docker_gid=$(stat -c '%g' /var/run/docker.sock) 
+  chmod g+rw /var/run/docker.sock
 fi
 if [ ! -z $docker_gid ]; then
   groupmod -g $docker_gid docker
@@ -183,6 +184,14 @@ done
 sleep 5
 su -w "JUPI_NOTEBOOK_TOKEN,BALENA_DEVICE_UUID" - dev -c "bash ${DIR}/credentials.sh > /tmp/credentials.txt"
 service grafana-server start
+# run user root required startup tasks
+if [ -e /program/jupiter_startup_tasks.sh ]; then 
+  bash /home/dev/jupiter_startup_tasks.sh &
+fi
+# run user required startup tasks
+if [ -e /home/dev/jupiter_startup_tasks.sh ]; then 
+  su -w "JUPI_NOTEBOOK_TOKEN,JUPI_AWS_ACCESS_KEY_ID,JUPI_AWS_SECRET_ACCESS_KEY,PATH,JUPYTERLAB_DIR,BALENA_DEVICE_UUID,CARGO_HOME,RUSTUP_HOME" - dev  -c "bash /home/dev/jupiter_startup_tasks.sh &"
+fi
 
 while sleep 60; do
   ps aux |grep code-server | grep -q -v grep

@@ -15,8 +15,8 @@ case "$(uname -m)" in
         echo "valid include - amd64 | aarch64" 
         ;;
 esac
-if [ -e "${DIR}/../docker-compose-local-override.yml" ]; then 
-    alias jupiter-compose="COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME} docker-compose -f docker-compose.yml -f docker-compose-local-override.yml"
+if [ -e "${DIR}/../jupiter-compose-override.yml" ]; then 
+    alias jupiter-compose="COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME} docker-compose -f docker-compose.yml -f jupiter-compose-override.yml"
 else 
     alias jupiter-compose="COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME} docker-compose -f docker-compose.yml"
 fi

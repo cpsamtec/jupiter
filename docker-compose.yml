@@ -25,10 +25,10 @@ services:
       - "8080:8080" # code server local
       - "28282:22" # ssh
       - "8050:8050" # dash server, spare
-      - "8022:8022"
+      - "8082:8082" # jupyter notebook
       - "33000:33000" # spare
       - "34000:34000" # spare
-      - "8888:8888" # jupyter notebook local
+      - "8888:8888" # spare
       - "63000:63000" # grafana
       - "64000:64000" # airflow
     env_file:
