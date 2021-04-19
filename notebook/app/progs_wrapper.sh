@@ -1,7 +1,9 @@
 #!/bin/bash
 echo "running notebook"
-set -x
-printenv 
+if [ ! -z ${JUPI_DEBUG} ]; then 
+  set -x
+  printenv 
+fi
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 JUPI_VIM_USER=${JUPI_VIM_USER:=0}
 

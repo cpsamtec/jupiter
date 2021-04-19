@@ -1,6 +1,9 @@
 #!/bin/bash
 echo "running airflow"
-set -x
+if [ ! -z ${JUPI_DEBUG} ]; then 
+  set -x
+  printenv 
+fi
 if [ ! -e ~/airflow/airflow.db ]; then 
   airflow db init
 else 
